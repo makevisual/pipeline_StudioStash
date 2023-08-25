@@ -1,19 +1,14 @@
-import tkinter as tk
-from tkinter import ttk
+curStr = R"C:\test\mockProjects\RepoRetimeRoughKey"
 
-# Create the main window
-root = tk.Tk()
-root.title("Text Widget Example")
+# Get the drive letter
+parts1 	= curStr.split(":\\")
+p1 		= parts1[0]
 
-# Create a custom style
-style = ttk.Style()
-style.configure("Custom.TText", background="lightgray")  # Change "lightgray" to your desired color
+# Get the Folder Name
+parts2 	= curStr.split("\\")
+p2 		= parts2[(len(parts2) - 1)]
 
-# Create a Text widget using the custom style
-text_widget = tk.Text(root, height=10, width=40, style="Custom.TText")
 
-# Pack the Text widget
-text_widget.pack(padx=10, pady=10)
-
-# Start the GUI event loop
-root.mainloop()
+print(curStr)
+print(p1)
+print(p2)
