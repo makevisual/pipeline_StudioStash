@@ -1,5 +1,7 @@
 import psutil #psutil is a secondary package
 import os
+import datetime
+from tkinter import filedialog
 
 # returns the size of a disk, returning a list with the total_space, used_space, and free_space, in bytes
 def get_disk_space(path):
@@ -33,6 +35,25 @@ def get_folder_size(folder_path):
     # print(f"Total size: {size_bytes} bytes, {size_kb:.2f} KB, {size_mb:.2f} MB, {size_gb:.2f} GB")
 
     return total_size
+
+# Update the sizes on each of the copyOperations
+def weighCopyOps(sdstData):
+    for op in sdstData.copyOperations:
+        print("Calculating size: ", op.pathSrc )
+        op.pathSrcSize = get_folder_size(op.pathSrc)
+
+# saves the passed content string out as a .bat file for processing later
+def bat_saveAs(contentStr):
+
+    current_datetime = datetime.datetime.now()
+    current_datetime_str = current_datetime.strftime("%Y_%m_%d__%H-%M-%S")
+
+    default_file_name = ("StudioStash__ArchiveOperations__" + current_datetime_str)
+
+    file_path = filedialog.asksaveasfilename(defaultextension=".bat", initialfile=default_file_name, filetypes=[("Batch processing file", "*.bat")])
+    if file_path:
+        with open(file_path, "w") as file:
+            file.write(contentStr)
 
 # spaceReport = get_disk_space("c:/")
 # print(spaceReport)

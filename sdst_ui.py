@@ -2,11 +2,24 @@ import tkinter as tk
 from tkinter import ttk
 from sdst_classes import *
 
+sdstVer = [0,0,1]
+data = [
+    (R"W:\Projects\Hot Wheels - Racerverse - Segment"		, "unknown"	),
+    (R"W:\Projects\FMW - Campaign"							, "unknown"	),
+    (R"W:\Projects\Hot Wheels - MT - Crushzilla Playset"	, "unknown"	),
+    (R"W:\Projects\BraveHurts"								, "unknown"	),
+    (R"W:\Projects\Hot Wheels - City - Ultimate Garage"		, "unknown"	),
+    (R"W:\Projects\Hot Wheels - City - TRCD"				, "unknown" ),
+]
+
+
+
+
 
 def ui_init():
 	# Set the window size (width x height)
 	print("UI INIT")
-	window.geometry("600x400")  # Width: 400, Height: 300
+	window.geometry("600x420")  # Width: 400, Height: 300
 	window.iconbitmap("makeIcon.ico")
 	window.configure(bg="#303841")  
 
@@ -71,33 +84,37 @@ txt_pathsDst.place(x=10, y=130)
 txt_pathsDst.configure(bg="#4f565e") 
 txt_pathsDst.configure(fg="white") 
 
-btn_pathsDstAdd = ttk.Button(window, text="Check", command=change_button_color)
-btn_pathsDstAdd.place(x=10, y=152)
+lab_pathsDstDisplay = ttk.Label(window, text="no destination set")
+lab_pathsDstDisplay.place(x=10, y=150)
+
+
+btn_pathsDstAdd = ttk.Button(window, text="Set", command=change_button_color)
+btn_pathsDstAdd.place(x=10, y=172)
 
 btn_pathsDstClear = ttk.Button(window, text="Clear", command=change_button_color)
-btn_pathsDstClear.place(x=88, y=152)
+btn_pathsDstClear.place(x=88, y=172)
 
 # PathsActive
 lab_pathsActive = ttk.Label(window, text="Valid path(s):")
-lab_pathsActive.place(x=10, y=200)
+lab_pathsActive.place(x=10, y=220)
 
 trv_pathsActive = ttk.Treeview(window, columns=("path", "size"), show="headings", height=4)
-trv_pathsActive.place(x=10, y=222)
+trv_pathsActive.place(x=10, y=242)
 trv_pathsActive_init()
 trv_pathsActive_populate()
 
 btn_pathsActiveCheckSize = ttk.Button(window, text="Check Size(s)", command=change_button_color)
-btn_pathsActiveCheckSize.place(x=10, y=332)
+btn_pathsActiveCheckSize.place(x=360, y=352)
 
 btn_pathsActiveGenScript = ttk.Button(window, text="Generate Archive Script", command=change_button_color)
 # btn_pathsActiveGenScript.place(x=88, y=332)
-btn_pathsActiveGenScript.place(x=439, y=332)
+btn_pathsActiveGenScript.place(x=439, y=352)
 
 
 
 # status 
 lab_status = ttk.Label(window, text=":")
-lab_status.place(x=10, y=375)
+lab_status.place(x=10, y=395)
 statusUpdate("ready")
 
 

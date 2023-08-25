@@ -50,26 +50,54 @@ def newCopyOp(arg_path):
 
 	# Concatenate the destination path, and the robocopy operation
 	newOp.pathDstFull = ( newOp.pathDstRoot + "\\" + projectName + "\\" + driveletter)
-	newOp.copyOperation = ( "robocopy "+ newOp.pathSrc + " " + newOp.pathDstFull + " /E /COPYALL /R:3 /W:1 /MT:32" )
+	newOp.copyOperation = ( "robocopy \""+ newOp.pathSrc + "\" \"" + newOp.pathDstFull + "\" /E /COPYALL /R:3 /W:1 /MT:32 /is /it" )
 
 	# returns the populated object
 	return newOp
 
+
+# Generates the string based off of the sdstData for the copy operation, and stores it on sdstData
+def generateArchiveScript(sdstData):
+
+	# declare Vars
+	newStr = ""
+
+	# generate the string for the file
+	for curOp in sdstData.copyOperations:
+		#print(curOp.copyOperation)
+		newStr += str(curOp.copyOperation)
+		newStr += "\n"
+	
+	newStr += "@echo off\n"
+	newStr += "echo ------------------------ Studio Stash ------------------------\n"
+	newStr += "echo Studio Stash operation completed, read robocopy reports above.\n"
+	newStr += "echo --------------------------------------------------------------\n"
+	newStr += "pause"
+
+	sdstData.archiveScriptString = newStr
+
+
 sdstData = SDSTData()
 
 # generate some fake input data
-#sdstData.pathsSrc=[R"C:\test\mockProjects\Nuke-HeiroConform_Rubiks", R"C:\test\mockProjects\RepoRetimeRoughKey", R"W:\Projects\BraveHurts"]
+# sdstData.pathsSrc=[R"C:\test\mockProjects\Nuke-HeiroConform_Rubiks", R"C:\test\mockProjects\RepoRetimeRoughKey", R"Z:\Projects\Hood Milk - VFX Clean up"]
 sdstData.pathsSrc=[R"C:\test\mockProjects\Nuke-HeiroConform_Rubiks", R"C:\test\mockProjects\RepoRetimeRoughKey"]
 sdstData.pathsDst=[R"C:\test\mockArchive"]
 
 
-
+# Collect all the copyOperations
 collectCopyOps()
-weighCopyOps()
 
-# create and display the info of the copy operation
-# curOp = newCopyOp(sdstData.pathsSrc[1])
-# curOp.pathSrcSize = get_folder_size(sdstData.pathsSrc[1])
+# Measure the size of each of the copyOperations
+#weighCopyOps()
 
-for op in sdstData.copyOperations:
-	op.display_info()
+# Generate and save the .bat file for robocopy to execute
+generateArchiveScript(sdstData)
+bat_saveAs(sdstData.archiveScriptString)
+
+
+#### Display all of the copy operations data
+#for op in sdstData.copyOperations:
+#	op.display_info()
+#print(sdstData.archiveScriptString)
+

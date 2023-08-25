@@ -1,14 +1,20 @@
-curStr = R"C:\test\mockProjects\RepoRetimeRoughKey"
+import tkinter as tk
+from tkinter import filedialog
 
-# Get the drive letter
-parts1 	= curStr.split(":\\")
-p1 		= parts1[0]
+def save_as():
+    default_file_name = "my_file.txt"
+    file_path = filedialog.asksaveasfilename(defaultextension=".txt", initialfile=default_file_name, filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
+    if file_path:
+        with open(file_path, "w") as file:
+            file.write("Hello, this is a test content!")
 
-# Get the Folder Name
-parts2 	= curStr.split("\\")
-p2 		= parts2[(len(parts2) - 1)]
+# Create the main window
+root = tk.Tk()
+root.title("Save As Dialog Example")
 
+# Create a button to trigger the save-as dialog
+save_button = tk.Button(root, text="Save As", command=save_as)
+save_button.pack(pady=20)
 
-print(curStr)
-print(p1)
-print(p2)
+# Run the main loop
+root.mainloop()
