@@ -1,20 +1,28 @@
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import ttk
+from sdst_classes import *
 
-def save_as():
-    default_file_name = "my_file.txt"
-    file_path = filedialog.asksaveasfilename(defaultextension=".txt", initialfile=default_file_name, filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
-    if file_path:
-        with open(file_path, "w") as file:
-            file.write("Hello, this is a test content!")
+class SDSTMainUi:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Python UI Example")
 
-# Create the main window
-root = tk.Tk()
-root.title("Save As Dialog Example")
+        self.label = tk.Label(root, text="Welcome to My UI")
+        self.label.pack(pady=10)
 
-# Create a button to trigger the save-as dialog
-save_button = tk.Button(root, text="Save As", command=save_as)
-save_button.pack(pady=20)
+        self.button1 = tk.Button(root, text="Show Message", command=self.show_message)
+        self.button1.pack()
 
-# Run the main loop
-root.mainloop()
+        self.button2 = tk.Button(root, text="Exit", command=self.exit_app)
+        self.button2.pack(pady=10)
+
+    def show_message(self):
+        messagebox.showinfo("Message", "Hello, this is a message!")
+
+    def exit_app(self):
+        self.root.destroy()
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    sdstMainUi = SDSTMainUi(root)
+    root.mainloop()

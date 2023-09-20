@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from sdst_classes import *
 from sdst_functions import *
+from sdst_ui import *
 import os
 
 # Update the sizes on each of the copyOperations
@@ -76,13 +77,29 @@ def generateArchiveScript(sdstData):
 
 	sdstData.archiveScriptString = newStr
 
+def uiStart(sdstData):
+	# Create the main window
+	root = tk.Tk()
 
+	# Create an instance of the SDST_UI_Main class
+	sdst_UI_Main = SDST_UI_Main(root, sdstData)
+
+	# Start the Tkinter main loop
+	root.mainloop()
+
+	return sdst_UI_Main
+
+# Instantiate the data object
 sdstData = SDSTData()
+sdstData.display_info()
+
 
 # generate some fake input data
 # sdstData.pathsSrc=[R"C:\test\mockProjects\Nuke-HeiroConform_Rubiks", R"C:\test\mockProjects\RepoRetimeRoughKey", R"Z:\Projects\Hood Milk - VFX Clean up"]
 sdstData.pathsSrc=[R"C:\test\mockProjects\Nuke-HeiroConform_Rubiks", R"C:\test\mockProjects\RepoRetimeRoughKey"]
 sdstData.pathsDst=[R"C:\test\mockArchive"]
+
+
 
 
 # Collect all the copyOperations
@@ -91,13 +108,19 @@ collectCopyOps()
 # Measure the size of each of the copyOperations
 #weighCopyOps()
 
-# Generate and save the .bat file for robocopy to execute
-generateArchiveScript(sdstData)
-bat_saveAs(sdstData.archiveScriptString)
+##### Generate and save the .bat file for robocopy to execute ####
+# generateArchiveScript(sdstData)
+# bat_saveAs(sdstData.archiveScriptString)
 
 
 #### Display all of the copy operations data
-#for op in sdstData.copyOperations:
-#	op.display_info()
-#print(sdstData.archiveScriptString)
+# for op in sdstData.copyOperations:
+# 	op.display_info()
 
+# print("------asfdasfd---------")
+# print(sdstData.archiveScriptString)
+
+
+
+# Instantiate the ui
+sdstData.ui_main = uiStart(sdstData)
