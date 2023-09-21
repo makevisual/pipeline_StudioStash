@@ -94,14 +94,6 @@ sdstData = SDSTData()
 sdstData.display_info()
 
 
-# generate some fake input data
-# sdstData.pathsSrc=[R"C:\test\mockProjects\Nuke-HeiroConform_Rubiks", R"C:\test\mockProjects\RepoRetimeRoughKey", R"Z:\Projects\Hood Milk - VFX Clean up"]
-sdstData.pathsSrc=[R"C:\test\mockProjects\Nuke-HeiroConform_Rubiks", R"C:\test\mockProjects\RepoRetimeRoughKey"]
-sdstData.pathsDst=[R"C:\test\mockArchive"]
-
-
-
-
 # Collect all the copyOperations
 collectCopyOps()
 

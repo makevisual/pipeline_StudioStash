@@ -16,6 +16,8 @@ class SDST_UI_Main:
     # Function for creating the UI, and laying out its 
     def __init__(self, root, sdstData):
 
+        self.sdstData = sdstData
+
         # Create the main window
         self.root = root
         self.root.title("StudioStash v"+ str(sdstVer[0]) + "." + str(sdstVer[1]) + "." + str(sdstVer[2]) )
@@ -60,7 +62,7 @@ class SDST_UI_Main:
         self.lab_pathsDstDisplay = ttk.Label(self.root, text="no destination set")
         self.lab_pathsDstDisplay.place(x=10, y=150)
 
-        self.btn_pathsDstAdd = ttk.Button(self.root, text="Set", command=self.testFunction)
+        self.btn_pathsDstAdd = ttk.Button(self.root, text="Set", command=self.updateUiAll)
         self.btn_pathsDstAdd.place(x=10, y=172)
 
         self.btn_pathsDstClear = ttk.Button(self.root, text="Clear", command=self.testFunction)
@@ -89,6 +91,18 @@ class SDST_UI_Main:
         self.lab_status = ttk.Label(self.root, text=":")
         self.lab_status.place(x=10, y=395)
         self.statusUpdate("ready")
+
+    def lab_pathsDstDisplay_pressed(self):
+        (
+            printsdstData
+        )
+
+    def updateUiAll(self):
+
+        
+        self.lab_pathsDstDisplay.config(text=sdstData.pathsDst[0])
+        self.sdstData # TODO - can do this as well
+        pass
 
     def testFunction(self):
         
@@ -122,9 +136,6 @@ class SDST_UI_Main:
 
         for item in data:
             self.trv_pathsActive.insert("", "end", values=item)
-        
-
-        pass
 
 
 if __name__ == "__main__":
@@ -133,6 +144,11 @@ if __name__ == "__main__":
 
     from sdst_classes import *
     sdstData = SDSTData()
+
+    # Temp Data
+    sdstData.pathsSrc=[R"C:\test\mockProjects\Nuke-HeiroConform_Rubiks", R"C:\test\mockProjects\RepoRetimeRoughKey"]
+    sdstData.pathsDst=[R"C:\test\mockArchive"]
+
 
     # Create an instance of the SDST_UI_Main class
     my_gui = SDST_UI_Main(root, sdstData)
