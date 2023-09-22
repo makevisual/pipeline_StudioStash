@@ -53,6 +53,16 @@ def newCopyOp(arg_path):
 	newOp.pathDstFull = ( newOp.pathDstRoot + "\\" + projectName + "\\" + driveletter)
 	newOp.copyOperation = ( "robocopy \""+ newOp.pathSrc + "\" \"" + newOp.pathDstFull + "\" /E /COPYALL /R:3 /W:1 /MT:32 /is /it" )
 
+
+
+
+# TODO: Switch to these settings
+# robocopy "Y:" "L:\LiveBackup\Y" /XD "Y:\System Volume Information" /MIR /MT:8 /w:1 /r:2
+# attrib -h -s -r "L:\LiveBackup\Y"
+# PAUSE
+
+
+
 	# returns the populated object
 	return newOp
 

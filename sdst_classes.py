@@ -1,10 +1,15 @@
+import tkinter as tk
+from tkinter import ttk
+
 # Main data class for holding all the data, and data objects
 class SDSTData:
-    def __init__(self, sdstVer=[0,0,1], input_pathsSrc=None, input_pathsDst=None, pathsSrc=[], pathsDst=[], copyOperations=[], archiveScriptString="", ui_main=None):
+    def __init__(self, sdstVer=[0,0,1], input_pathsSrc=None, input_pathsDst=None, pathsSrc=[], pathsSrcSpaceReport=[], pathsDst=[], pathsDstSpaceReport=[], copyOperations=[], archiveScriptString="", ui_main=None):
         self.input_pathsSrc         = input_pathsSrc
         self.input_pathsDst         = input_pathsDst
         self.pathsSrc               = pathsSrc
+        self.pathsSrcSpaceReport    = pathsSrcSpaceReport
         self.pathsDst               = pathsDst
+        # self.pathsDstSpaceReport    = pathsDstSpaceReport
         self.copyOperations         = copyOperations
         self.archiveScriptString    = archiveScriptString
         self.ui_main                = ui_main
@@ -13,7 +18,9 @@ class SDSTData:
         print(f"input_pathsSrc:         {self.input_pathsSrc}")
         print(f"input_pathsDst:         {self.input_pathsDst}")
         print(f"pathsSrc:               {self.pathsSrc}")
+        print(f"pathsSrcSpaceReport:    {self.pathsSrcSpaceReport}")
         print(f"pathsDst:               {self.pathsDst}")
+        # print(f"pathsDstSpaceReport:    {self.pathsDstSpaceReport}")
         print(f"copyOperations:         {self.copyOperations}")
         print(f"archiveScriptString:    {self.archiveScriptString}")
         print(f"ui_main:                {self.ui_main}")

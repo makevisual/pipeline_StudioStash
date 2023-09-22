@@ -1,28 +1,30 @@
-import tkinter as tk
-from tkinter import ttk
-from sdst_classes import *
+    # thread for calculating the size of source paths, and returning them to the UI
+    def btn_pathsSrcActiveCheckSize_pressed(self):
 
-class SDSTMainUi:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Python UI Example")
+        # Clear out reports
+        spaceReports = []
 
-        self.label = tk.Label(root, text="Welcome to My UI")
-        self.label.pack(pady=10)
+        # For each of the paths find the size
+        for curPath in self.sdstData.pathsSrc:
+            
+            sizeCellText = "calculating..."
+            spaceReports.append(sizeCellText)
 
-        self.button1 = tk.Button(root, text="Show Message", command=self.show_message)
-        self.button1.pack()
+            # Update the UI with the path being operated on
+            self.btn_pathsSrcActiveCheckSize_pressed_statusUpdate( curPath )
+            self.btn_pathsSrcActiveCheckSize_pressed_updateSize(spaceReports)            
 
-        self.button2 = tk.Button(root, text="Exit", command=self.exit_app)
-        self.button2.pack(pady=10)
+            # Start Calculating the size
+            # self.curPathSpaceReport = get_folder_size(curPath)
+            curPathSpaceReport = get_folder_size(curPath)
 
-    def show_message(self):
-        messagebox.showinfo("Message", "Hello, this is a message!")
+            # Turn it into Gigabytes
+            size_kb = curPathSpaceReport / 1024
+            size_mb = size_kb / 1024
+            size_gb = size_mb / 1024
 
-    def exit_app(self):
-        self.root.destroy()
+            # Add the size to the space reports list
+            sizeCellText = size_gb
 
-if __name__ == "__main__":
-    root = tk.Tk()
-    sdstMainUi = SDSTMainUi(root)
-    root.mainloop()
+            # Return the space reports to the main thread
+            self.btn_pathsSrcActiveCheckSize_pressed_updateSize(spaceReports)       

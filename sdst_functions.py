@@ -3,6 +3,12 @@ import os
 import datetime
 from tkinter import filedialog
 
+def clean_file_path(input_path):
+    # Replace single slashes with double slashes
+    cleaned_path = input_path.replace('\\', '\\\\')
+    return cleaned_path
+
+
 # returns the size of a disk, returning a list with the total_space, used_space, and free_space, in bytes
 def get_disk_space(path):
     disk_usage = psutil.disk_usage(path)
@@ -10,9 +16,9 @@ def get_disk_space(path):
     used_space = disk_usage.used
     free_space = disk_usage.free
 
-    print(f"Total space:    {total_space    / ( 1024 ** 3 ):.2f} GB")
-    print(f"Used space:     {used_space     / ( 1024 ** 3 ):.2f} GB")
-    print(f"Free space:     {free_space     / ( 1024 ** 3 ):.2f} GB")
+    # print(f"Total space:    {total_space    / ( 1024 ** 3 ):.2f} GB")
+    # print(f"Used space:     {used_space     / ( 1024 ** 3 ):.2f} GB")
+    # print(f"Free space:     {free_space     / ( 1024 ** 3 ):.2f} GB")
 
     return [total_space, used_space, free_space]
 
