@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk 
 from sdst_functions import *
 import os
+import sys
 import datetime
 import threading
 
@@ -20,8 +21,12 @@ class SDST_UI_Main:
 
         # Set the window size (width x height)
         self.root.geometry("600x560")  # Width: 400, Height: 300
-        self.root.iconbitmap("makeIcon.ico")
         self.root.configure(bg="#303841") 
+
+        # Sort out the icon file
+        # icon_path = os.path.join(sys._MEIPASS, 'makeIcon.ico')
+        icon_path = R"C:\Users\MAKE\Documents\GitHub\pipeline_StudioStash\Codebase\makeIcon.ico"
+        self.root.iconbitmap(icon_path)
 
         # Set the style
         style = ttk.Style()
@@ -506,19 +511,20 @@ class SDST_UI_Main:
         
         print("Test Function Ran")
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
+#   pass
     
-    #Timestamp
-    print(datetime.datetime.now())
+#Timestamp
+print(datetime.datetime.now())
 
-    # Create the main window
-    root = tk.Tk()
+# Create the main window
+root = tk.Tk()
 
-    from sdst_classes import *
-    sdstData = SDSTData()
+from sdst_classes import *
+sdstData = SDSTData()
 
-    # Create an instance of the SDST_UI_Main class
-    my_gui = SDST_UI_Main(root, sdstData)
+# Create an instance of the SDST_UI_Main class
+my_gui = SDST_UI_Main(root, sdstData)
 
-    # Start the Tkinter main loop
-    root.mainloop()
+# Start the Tkinter main loop
+root.mainloop()
