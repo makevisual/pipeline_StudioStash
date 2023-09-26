@@ -24,8 +24,14 @@ class SDST_UI_Main:
         self.root.configure(bg="#303841") 
 
         # Sort out the icon file
-        # icon_path = os.path.join(sys._MEIPASS, 'makeIcon.ico')
-        icon_path = R"C:\Users\MAKE\Documents\GitHub\pipeline_StudioStash\Codebase\makeIcon.ico"
+        if getattr(sys, 'frozen', False):
+            # Running as a PyInstaller executable
+            icon_path = os.path.join(sys._MEIPASS, 'makeIcon.ico')
+        else:
+            # Running as a regular Python script
+            icon_path = 'makeIcon.ico'
+
+        #icon_path = R"C:\Users\MAKE\Documents\GitHub\pipeline_StudioStash\Codebase\makeIcon.ico"
         self.root.iconbitmap(icon_path)
 
         # Set the style

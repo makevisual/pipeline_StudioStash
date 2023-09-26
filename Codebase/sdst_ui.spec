@@ -5,7 +5,7 @@ a = Analysis(
     ['sdst_ui.pyw'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('makeIcon.ico', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
