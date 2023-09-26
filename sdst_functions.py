@@ -3,11 +3,11 @@ import os
 import datetime
 from tkinter import filedialog
 
+# cleans up the filepath
 def clean_file_path(input_path):
     # Replace single slashes with double slashes
     cleaned_path = input_path.replace('\\', '\\\\')
     return cleaned_path
-
 
 # returns the size of a disk, returning a list with the total_space, used_space, and free_space, in bytes
 def get_disk_space(path):
@@ -60,9 +60,3 @@ def bat_saveAs(contentStr):
     if file_path:
         with open(file_path, "w") as file:
             file.write(contentStr)
-
-# spaceReport = get_disk_space("c:/")
-# print(spaceReport)
-
-# curSize = get_folder_size(R"U:\Assets")
-# print(curSize)

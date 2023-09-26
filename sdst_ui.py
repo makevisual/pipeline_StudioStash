@@ -5,7 +5,7 @@ import os
 import datetime
 import threading
 
-sdstVer = [0,0,1]
+sdstVer = [0,1,0]
 
 class SDST_UI_Main:
 
@@ -81,16 +81,16 @@ class SDST_UI_Main:
         self.btn_GenScript_pressed = ttk.Button(self.root, text="  Generate Batch Archive Script  ", command=self.btn_GenScript_pressed)
         self.btn_GenScript_pressed.place(x=395, y=500)
 
-        self.btn_injectData = ttk.Button(self.root, text="  inject temp data  ", command=self.injectData)
-        self.btn_injectData.place(x=10, y=500)
-
-        self.btn_displayData = ttk.Button(self.root, text="  print data  ", command=self.sdstDataDisplay)
-        self.btn_displayData.place(x=120, y=500)
-
         # status bar
         self.lab_status = ttk.Label(self.root, text=":")
         self.lab_status.place(x=10, y=530)
         self.statusUpdate("Ready")
+
+        # buttons for debug and testing
+        # self.btn_injectData = ttk.Button(self.root, text="  inject temp data  ", command=self.injectData)
+        # self.btn_injectData.place(x=10, y=500)
+        # self.btn_displayData = ttk.Button(self.root, text="  print data  ", command=self.sdstDataDisplay)
+        # self.btn_displayData.place(x=120, y=500)
 
     # Function for button press that sanitizes the input text and adds it to the sdstData.pathsSrc if they exist
     def btn_pathsSrcAdd_pressed(self):
@@ -170,36 +170,40 @@ class SDST_UI_Main:
     def injectData(self):
 
         # Temp Data
-        self.sdstData.pathsSrc=["C:\\\\test\\\\mockProjects\\Nuke-HeiroConform_Rubiks", "C:\\\\test\\\\mockProjects\\\\RepoRetimeRoughKey","W:\\\\Projects\\\\AOT - Teaser"]
+        self.sdstData.pathsSrc=["C:\\\\test\\\\mockProjects\\Nuke-HeiroConform_Rubiks", "C:\\\\test\\\\mockProjects\\\\RepoRetimeRoughKey"]
+        # self.sdstData.pathsSrc=["C:\\\\test\\\\mockProjects\\Nuke-HeiroConform_Rubiks", "C:\\\\test\\\\mockProjects\\\\RepoRetimeRoughKey","W:\\\\Projects\\\\AOT - Teaser"]
         # self.sdstData.pathsSrc=["C:\\\\test\\\\mockProjects\\Nuke-HeiroConform_Rubiks", "C:\\\\test\\\\mockProjects\\\\RepoRetimeRoughKey","W:\\\\Projects\\\\AOT - Teaser","X:\\\\Projects\\\\Days","X:\\\\Projects\\\\CHS - CorpRefresh Video","X:\\\\Projects\\\\F22 HW City - Action Spiral Playset"]
         # self.sdstData.pathsSrc=["C:\\\\test\\\\mockProjects\\Nuke-HeiroConform_Rubiks", "C:\\\\test\\\\mockProjects\\\\RepoRetimeRoughKey","W:\\\\Projects\\\\AOT - Teaser","X:\\\\Projects\\\\Callaway - Precision Technology","X:\\\\Projects\\\\Bridgestone - B-Seal","X:\\\\Projects\\\\CMDA"]
         self.sdstData.pathsDst=["C:\\test\\mockArchive"]
 
-        # populate
+        # populate the tree views
         self.trv_pathsSrcActive_populate()
         self.trv_pathsDstActive_populate()
 
+        # Run the copy operation collection
         self.collectCopyOps()
 
+        # Update the status
         self.statusUpdate("Test Data Injected")
-
 
     # !!! --- thread for calculating the size of source paths, and returning them to the UI
     def btn_pathsSrcActiveCheckSize_pressed(self):
 
         # Clear out reports, and fill them with "calculating..."
-        spaceReports = []
-        entryText = "Calculating..."
-        self.pathsSrcSpaceReportRun = True
+        spaceReports = []                   # New list, that is clean
+        self.pathsSrcSpaceReport = []       # Clean out the stored list as well
+        entryText = "Calculating..."        # Dummy text to be in place until overwritten
+        self.pathsSrcSpaceReportRun = True  # PoisonPill for terminating early
 
-        for i in range(len(sdstData.pathsSrc)):
+        # Fill the space reports with placeholder entry text, until it can be overwritten
+        for j in range(len(sdstData.pathsSrc)):
             spaceReports.append(entryText)
 
-        # Update the list with the 'calculating' list
+        # Update the list view with the 'calculating' list
         self.btn_pathsSrcActiveCheckSize_pressed_updateSize(spaceReports)
 
         # For each of the paths find the size
-        i=0
+        i=0 # Loop counter
         for curPath in self.sdstData.pathsSrc:
 
             # Before beginning any new checks, exit the operation if the killswitch has been flipped
@@ -225,6 +229,7 @@ class SDST_UI_Main:
             self.btn_pathsSrcActiveCheckSize_pressed_updateSize(spaceReports)
             self.lab_pathsSrcActiveTotalSize_update()
 
+            # Increment
             i+=1
 
         self.btn_pathsSrcActiveCheckSize_pressed_statusComplete()
@@ -285,8 +290,12 @@ class SDST_UI_Main:
             self.sdstData.display_info()
             self.trv_pathsDstActive_populate()
 
+            # Update the log
+            self.statusUpdate("Path Added")
+
         # If invalid, clear any existing paths out
         else: 
+            # Update the log
             self.statusUpdate("Invalid Destination Path")
                
     # Function for pressing the "Clear All" valid paths button
@@ -401,14 +410,11 @@ class SDST_UI_Main:
             newEntry = [item,sizeReportParsed]
             self.trv_pathsDstActive.insert("", "end", values=newEntry)
 
-
-
-
-    # function for creating all of the CopyOperationInfo objects from a list of input paths and destination paths
-    # the created objecs are added to the "sdstData.copyOperations" list for later access
+    # function for creating all of the CopyOperationInfo objects and storing it in "sdstData.copyOperations"
     def collectCopyOps(self):
 
         # Create a new variable for handleID
+        self.sdstData.copyOperations = []
         handleID = 1 
 
         # Loop for each of the destinations
@@ -417,28 +423,83 @@ class SDST_UI_Main:
             # create a CopyOperationInfo for each of the src paths provided
             for pathSrc in self.sdstData.pathsSrc:
 
-                # Create a new CopyOp, and give it a handle
-                curOp = newCopyOp(pathSrc)
-                curOp.handle = handleID
+                # Verify paths are sanatized for the OS
+                pathSrc = os.path.normpath(pathSrc)
+                pathDst = os.path.normpath(pathDst)
+
+                # Create a new CopyOp, and populate it
+                curOp = CopyOperationInfo()
+                curOp.populate(pathSrc, pathDst, handleID)
+
+                # Increment the handle
                 handleID+=1
 
                 # Add the newly created 
                 self.sdstData.copyOperations.append(curOp)
 
-        print( "Number of copy operations: ", str(len(self.sdstData.copyOperations)))
+    # Generate the archive script .bat command
+    def generateArchiveScript(self):
 
+        # declare Vars
+        newStr = ""
 
-    def generateCopyOperations(self):
-        pass
+        newStr += "@echo off\n"
+        newStr += "echo Starting the operation...\n"
+        newStr += "setlocal enabledelayedexpansion\n"
+        newStr += "for /f \"tokens=1-4 delims=:.,\" %%a in (\"%time%\") do (\n"
+        newStr += "    set /a \"start_time=(((%%a*60)+1%%b %% 100)*60+1%%c %% 100)*100+1%%d %% 100\"\n"
+        newStr += ")\n"
+        newStr += "\n"
+        newStr += "\n"
 
+        # generate the string for the file
+        for curOp in self.sdstData.copyOperations:
+            #print(curOp.copyOperation)
+            newStr += str(curOp.copyOperation)
+            newStr += "\n"
+            newStr += "\n"
+        
+        # Add footer
+        newStr += "\n"
+        newStr += "\n"
+        newStr += "for /f \"tokens=1-4 delims=:.,\" %%a in (\"%time%\") do (\n"
+        newStr += "    set /a \"end_time=(((%%a*60)+1%%b %% 100)*60+1%%c %% 100)*100+1%%d %% 100\"\n"
+        newStr += ")\n"
+        newStr += "\n"
+        newStr += "set /a \"duration=end_time - start_time\"\n"
+        newStr += "set /a \"seconds=duration / 100\"\n"
+        newStr += "set /a \"milliseconds=duration %% 100\"\n"
+        newStr += "set /a \"minutes=seconds / 60\"\n"
+        newStr += "set /a \"seconds=seconds %% 60\"\n"
+        newStr += "set /a \"hours=duration / 3600000\""
+        newStr += "\n"
+        newStr += "echo ------------------------ Studio Stash ------------------------\n"
+        newStr += "echo Studio Stash operation completed, read robocopy reports above.\n"
+        newStr += ("echo " + str(len(self.sdstData.copyOperations)) + " folders were processed. \n")
+        newStr += "echo The operation took !hours! hours, !minutes! minutes and !seconds! seconds and !milliseconds! milliseconds.\n"
+        newStr += "echo --------------------------------------------------------------\n"
+        newStr += "pause"
 
+        self.sdstData.archiveScriptString = newStr
 
+    # Main export button pressed
     def btn_GenScript_pressed(self):
-        print("-- gen script --")
-        pass
+        
+        # Collect the copy operations
+        self.collectCopyOps()
+        
+        # Display the copy operations info
+        for op in self.sdstData.copyOperations:
+            op.display_info()
 
+        # generate archive script
+        self.generateArchiveScript()
 
+        # update status        
+        self.statusUpdate(str(len(self.sdstData.copyOperations)) + " Copy operations generated " )
 
+        # Generate the .bat file
+        bat_saveAs(self.sdstData.archiveScriptString)
 
     # For testing buttons
     def testFunction(self):
@@ -461,7 +522,3 @@ if __name__ == "__main__":
 
     # Start the Tkinter main loop
     root.mainloop()
-
-
-
-# TODO: Put a check for same path in the source and destination, could result in a loop

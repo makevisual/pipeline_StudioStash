@@ -15,7 +15,7 @@ class SDSTData:
         self.archiveScriptString    = archiveScriptString
         self.ui_main                = ui_main
 
-
+    # Prints the available information
     def display_info(self):
         print(f"input_pathsSrc:         {self.input_pathsSrc}")
         print(f"input_pathsDst:         {self.input_pathsDst}")
@@ -46,14 +46,13 @@ class CopyOperationInfo:
         print(f"pathDstFull:    {self.pathDstFull}")
         print(f"copyOperation:  {self.copyOperation}")
 
+    # populates self with the copy operation details
     def populate(self, arg_pathSrc="", arg_pathDst="",arg_handle=None):
 
         # Sanitize and assign the source and destination paths
         self.pathSrc       = arg_pathSrc
         self.pathDstRoot   = arg_pathDst
-
-        # self.pathSrc       = (os.path.normpath(arg_pathSrc))
-        # self.pathDstRoot   = (os.path.normpath(arg_pathDst))
+        self.arg_handle    = arg_handle
 
         # Get the source drive letter
         parts1      = self.pathSrc.split(":\\")
@@ -70,13 +69,9 @@ class CopyOperationInfo:
         # returns the populated object
         return self
 
-#        pass
-
-
+# Debug / temp data
 if __name__ == "__main__":
     
     opInfo = CopyOperationInfo()
     opInfo.populate("C:\\\\test\\\\mockProjects\\Nuke-HeiroConform_Rubiks","C:\\test\\mockArchive")
     opInfo.display_info()
-    # sdstData = SDSTData()
-    # sdstData.display_info()
