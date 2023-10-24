@@ -1,4 +1,4 @@
-import psutil #psutil is a secondary package
+import psutil #psutil is a secondary package for getting disk usage
 import os
 import datetime
 from tkinter import filedialog

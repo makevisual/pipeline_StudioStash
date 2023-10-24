@@ -5,8 +5,10 @@ import os
 import sys
 import datetime
 import threading
+import win32com.client
+import shutil 
 
-sdstVer = [0,1,0]
+sdstVer = [0,1,1]
 
 class SDST_UI_Main:
 
@@ -20,7 +22,7 @@ class SDST_UI_Main:
         self.root.title("StudioStash v"+ str(sdstVer[0]) + "." + str(sdstVer[1]) + "." + str(sdstVer[2]) )
 
         # Set the window size (width x height)
-        self.root.geometry("600x560")  # Width: 400, Height: 300
+        self.root.geometry("600x580")  # Width: 400, Height: 300
         self.root.configure(bg="#303841") 
 
         # Sort out the icon file
@@ -37,7 +39,7 @@ class SDST_UI_Main:
         # Set the style
         style = ttk.Style()
         style.configure("TLabel", background="#303841", foreground="white")  # Set label colors
-        style.configure("TButton", background="#4f565e", foreground="black")  # Set button colors
+        style.configure("TButton", background="#4f565e", foreground="black", height="2")  # Set button colors
         style.configure("TEntry", fieldbackground="#444444", foreground="black") 
         style.configure("TText", background="#303841", foreground="white") 
 
@@ -68,40 +70,137 @@ class SDST_UI_Main:
 
         # PathsDst Entry
         self.lab_pathsDst = ttk.Label(self.root, text="Destination path(s):")
-        self.lab_pathsDst.place(x=10, y=280)
+        self.lab_pathsDst.place(x=10, y=260)
         self.txt_pathsDst = tk.Entry(self.root,width=93)
-        self.txt_pathsDst.place(x=10, y=300)
+        self.txt_pathsDst.place(x=10, y=280)
         self.txt_pathsDst.configure(bg="#4f565e") 
         self.txt_pathsDst.configure(fg="white") 
         self.btn_pathsDstAdd = ttk.Button(self.root, text="Add", command=self.btn_pathsDstAdd_pressed)
-        self.btn_pathsDstAdd.place(x=10, y=322)
+        self.btn_pathsDstAdd.place(x=10, y=302)
         
         # PathsDstActive Treeview
         self.lab_pathsDstActive = ttk.Label(self.root, text="Valid destination path(s):")
-        self.lab_pathsDstActive.place(x=10, y=355)
+        self.lab_pathsDstActive.place(x=10, y=335)
         self.trv_pathsDstActive = ttk.Treeview(self.root, columns=("path", "size"), show="headings", height=2)
-        self.trv_pathsDstActive.place(x=10, y=375)
+        self.trv_pathsDstActive.place(x=10, y=355)
         self.btn_pathsDstActiveClear = ttk.Button(self.root, text="Clear All", command=self.btn_pathsDstActiveClear_pressed)
-        self.btn_pathsDstActiveClear.place(x=10, y=445)
+        self.btn_pathsDstActiveClear.place(x=10, y=425)
         self.btn_pathsDstActiveCheckSize = ttk.Button(self.root, text="Check Free Space ", command=self.btn_pathsDstActiveCheckSize_pressed)
-        self.btn_pathsDstActiveCheckSize.place(x=88, y=445)
+        self.btn_pathsDstActiveCheckSize.place(x=88, y=425)
         # And initialize it
         self.trv_pathsDstActive_init()
 
+        # PathDstLinkActive
+        self.lab_pathDstLink = ttk.Label(self.root, text="Shortcut path:")
+        self.lab_pathDstLink.place(x=10, y=460) #280
+        self.btn_pathDstLinkSet = ttk.Button(self.root, text="Set", command=self.btn_pathDstLinkSet_pressed)
+        self.btn_pathDstLinkSet.place(x=10, y=480)
+        self.txt_pathDstLink = tk.Entry(self.root,width=80)
+        self.txt_pathDstLink.place(x=90, y=482)
+        self.txt_pathDstLink.configure(bg="#4f565e") 
+        self.txt_pathDstLink.configure(fg="white") 
+
+        # PathDstLinkActive / Clear
+        self.btn_pathDstLinkActiveClear = ttk.Button(self.root, text="Clear", command=self.btn_pathDstLinkActiveClear_pressed)
+        self.btn_pathDstLinkActiveClear.place(x=10, y=505)
+        self.lab_pathDstLinkActive = ttk.Label(self.root, text="No Shortcut Path Set")
+        self.lab_pathDstLinkActive.place(x=90, y=508) #280
+
         # Generate button
         self.btn_GenScript_pressed = ttk.Button(self.root, text="  Generate Batch Archive Script  ", command=self.btn_GenScript_pressed)
-        self.btn_GenScript_pressed.place(x=395, y=500)
+        self.btn_GenScript_pressed.place(x=395, y=530) #500
 
         # status bar
         self.lab_status = ttk.Label(self.root, text=":")
-        self.lab_status.place(x=10, y=530)
+        self.lab_status.place(x=10, y=555) #530
         self.statusUpdate("Ready")
 
         # buttons for debug and testing
         # self.btn_injectData = ttk.Button(self.root, text="  inject temp data  ", command=self.injectData)
-        # self.btn_injectData.place(x=10, y=500)
+        # self.btn_injectData.place(x=400, y=10)
         # self.btn_displayData = ttk.Button(self.root, text="  print data  ", command=self.sdstDataDisplay)
-        # self.btn_displayData.place(x=120, y=500)
+        # self.btn_displayData.place(x=500, y=10)
+
+        self.pathDstLink_update()
+
+    # Function to update the UI items, if the destination path is valid or not
+    def pathDstLink_update(self):
+
+        # Test if the path has been set
+        if self.sdstData.pathDstLink != None:
+
+        # Test if the path exists
+            if os.path.exists(self.sdstData.pathDstLink):
+
+                # Update the shortcut path display
+                self.lab_pathDstLinkActive.config(text=(self.sdstData.pathDstLink))
+
+                # Update the status
+                self.statusUpdate("Shortcut Path Set")
+
+            # If the path does not exist
+            else:
+
+                # Nullify the data
+                self.sdstData.pathDstLink = None
+
+        # If the destination path is null
+        if self.sdstData.pathDstLink == None:
+
+            # Update the config file
+            self.sdstData.config.set('Settings', 'shortcutpath', "None")
+
+            # Save the changes back to the file
+            with open(self.sdstData.configFile, 'w') as configfile:
+                self.sdstData.config.write(configfile)
+
+            # Update UI with invailid path warning
+            self.statusUpdate("No Vailid Shortcut Path Set") 
+            self.lab_pathDstLinkActive.config(text=("No Shortcut Path Set"))
+
+    # Function for when the clear shortcut path is pressed
+    def btn_pathDstLinkActiveClear_pressed(self):
+
+        # Nullify the data
+        self.sdstData.pathDstLink = None
+
+        # Update all relevant UI items
+        self.pathDstLink_update()
+
+    # Function for when the set shortcut path button is pressed
+    def btn_pathDstLinkSet_pressed(self):
+        self.sdstData.input_pathDstLink = self.txt_pathDstLink.get()
+        # print ("--- Raw SRC Input --- ", self.sdstData.input_pathDstLink)
+
+        # Sanatize the string
+        cleaned_path = self.sdstData.input_pathDstLink.replace("\"", "")   # Takes away Quotes
+        cleaned_path = cleaned_path.replace("/", "\\")                  # Sets slash directions
+        cleaned_path = cleaned_path.replace(",", "")                    # takes away commas
+
+        # Run the filepath through a normalizer for the operating system
+        cleaned_path = os.path.normpath(cleaned_path)
+
+        # Test if path exists 
+        if os.path.exists(cleaned_path):
+            
+            # Update the data object
+            self.sdstData.pathDstLink = cleaned_path
+
+            # Update the config file
+            self.sdstData.config.set('Settings', 'shortcutpath', self.sdstData.pathDstLink)
+
+            # Save the changes back to the file
+            with open(self.sdstData.configFile, 'w') as configfile:
+                self.sdstData.config.write(configfile)
+
+        # If the path is invalid, nullify the data
+        else:
+            self.sdstData.pathDstLink = None
+
+        # Update the UI items related to the shortcut link
+        self.pathDstLink_update()
+
+        sdstData.display_info()
 
     # Function for button press that sanitizes the input text and adds it to the sdstData.pathsSrc if they exist
     def btn_pathsSrcAdd_pressed(self):
@@ -186,6 +285,7 @@ class SDST_UI_Main:
         # self.sdstData.pathsSrc=["C:\\\\test\\\\mockProjects\\Nuke-HeiroConform_Rubiks", "C:\\\\test\\\\mockProjects\\\\RepoRetimeRoughKey","W:\\\\Projects\\\\AOT - Teaser","X:\\\\Projects\\\\Days","X:\\\\Projects\\\\CHS - CorpRefresh Video","X:\\\\Projects\\\\F22 HW City - Action Spiral Playset"]
         # self.sdstData.pathsSrc=["C:\\\\test\\\\mockProjects\\Nuke-HeiroConform_Rubiks", "C:\\\\test\\\\mockProjects\\\\RepoRetimeRoughKey","W:\\\\Projects\\\\AOT - Teaser","X:\\\\Projects\\\\Callaway - Precision Technology","X:\\\\Projects\\\\Bridgestone - B-Seal","X:\\\\Projects\\\\CMDA"]
         self.sdstData.pathsDst=["C:\\test\\mockArchive"]
+        self.sdstData.pathDstLink= "C:\\test\\shortcutPaths"
 
         # populate the tree views
         self.trv_pathsSrcActive_populate()
@@ -448,6 +548,19 @@ class SDST_UI_Main:
                 # Add the newly created 
                 self.sdstData.copyOperations.append(curOp)
 
+    # Create a .lnk file from passed arguments
+    def generateShortcut(self, arg_target, arg_shortcut):
+
+        # Create a shortcut object
+        shell = win32com.client.Dispatch("WScript.Shell")
+        shortcut = shell.CreateShortCut(arg_shortcut)
+
+        # Set the target path for the shortcut
+        shortcut.TargetPath = arg_target
+
+        # Save the shortcut  
+        shortcut.Save()
+
     # Generate the archive script .bat command
     def generateArchiveScript(self):
 
@@ -493,6 +606,44 @@ class SDST_UI_Main:
 
         self.sdstData.archiveScriptString = newStr
 
+    # Function for creating all the shortcut links, from the data object
+    # NOTE - The destination of the shortcut must exist for windows to create a link
+    # A directory will be made if one does not exist, to link to.
+    def generateShortcutLinks(self):
+
+        # Test if the shortcut directory path exists
+            if os.path.exists(self.sdstData.pathDstLink):
+                
+                # for each of the operations, create a shortcut
+                for curOp in sdstData.copyOperations:
+
+                    # Make the folder for the shortcut target, if one is not there already.
+                    if os.path.exists(curOp.pathDstFull):
+                        pass 
+                    else:
+                        os.makedirs(curOp.pathDstFull)
+
+                    # Create a new timestamp, for folder naming
+                    now = datetime.datetime.now()
+                    curTimeStamp = ( str(now.year) + "_" + str(now.month) + "_" + str(now.day) )
+
+                    # Generate the full shortcut path
+                    shortcutLinkPath = (self.sdstData.pathDstLink + "\\" + curOp.projectName +"__" + curTimeStamp + ".lnk" )
+
+                    # Create the shortcuts
+                    self.generateShortcut(curOp.pathDstFull, shortcutLinkPath)
+
+    def generateShortcutLinksCleanup(self):
+        # Test if the shortcut directory path exists
+            if os.path.exists(self.sdstData.pathDstLink):
+                
+                # for each of the operations, create a shortcut
+                for curOp in sdstData.copyOperations:
+
+                    # Test if the folder is less than 10 kb, and delete if true
+                    if get_folder_size(curOp.pathDstProject) <= 10:
+                        shutil.rmtree(curOp.pathDstProject)
+
     # Main export button pressed
     def btn_GenScript_pressed(self):
         
@@ -506,6 +657,11 @@ class SDST_UI_Main:
         # generate archive script
         self.generateArchiveScript()
 
+        # generate shortcut links
+        self.generateShortcutLinks()
+        # remove any temporary directories made for the shortcut generation
+        self.generateShortcutLinksCleanup()
+
         # update status        
         self.statusUpdate(str(len(self.sdstData.copyOperations)) + " Copy operations generated " )
 
@@ -516,6 +672,7 @@ class SDST_UI_Main:
     def testFunction(self):
         
         print("Test Function Ran")
+        self.statusUpdate(" Test Function Ran " )
 
 #if __name__ == "__main__":
 #   pass
