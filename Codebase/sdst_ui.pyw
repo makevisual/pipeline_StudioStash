@@ -25,7 +25,7 @@ class SDST_UI_Main:
         self.root.geometry("600x580")  # Width: 400, Height: 300
         self.root.configure(bg="#303841") 
 
-        # Sort out the icon file
+        # Sort out the icon file for compiling
         if getattr(sys, 'frozen', False):
             # Running as a PyInstaller executable
             icon_path = os.path.join(sys._MEIPASS, 'makeIcon.ico')
