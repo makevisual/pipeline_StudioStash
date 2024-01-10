@@ -135,9 +135,14 @@ class SDST_UI_Main:
     # Function to set the copy method, when selected from the dropdown
     def ddl_copyMethod_pressed(self, *args):
 
-        #selected_item = self.sdstData.copyMethod.get()
         self.sdstData.copyMethodStr = self.sdstData.copyMethod.get()
-        self.statusUpdate("'" + self.sdstData.copyMethodStr + "' Selected")
+
+        if self.sdstData.copyMethodStr == "mirror copy":
+            self.statusUpdate("'Mirror Copy' Selected, WARNING! This will remove destination files and directories absent in source.")
+
+        if self.sdstData.copyMethodStr == "additive copy":
+            self.statusUpdate("'Additive Copy' Selected, this will append to all destination files and directories.")
+
         self.btn_GenScript_pressed.config(state="enabled")
 
     # Function to update the UI items, if the destination path is valid or not
