@@ -8,7 +8,7 @@ import threading
 import win32com.client
 import shutil 
 
-sdstVer = [0,1,1]
+sdstVer = [0,1,2]
 
 class SDST_UI_Main:
 
@@ -46,7 +46,7 @@ class SDST_UI_Main:
         # PathsSrc Entry
         self.lab_pathsSrc = ttk.Label(self.root, text="Source path(s) to copy:")
         self.lab_pathsSrc.place(x=10, y=10)
-        self.txt_pathsSrc = tk.Text(self.root,width=70,height=2)
+        self.txt_pathsSrc = tk.Text(self.root,width=50,height=2)
         self.txt_pathsSrc.place(x=10, y=30)
         self.txt_pathsSrc.configure(bg="#4f565e") 
         self.txt_pathsSrc.configure(fg="white") 
@@ -106,9 +106,18 @@ class SDST_UI_Main:
         self.lab_pathDstLinkActive = ttk.Label(self.root, text="No Shortcut Path Set")
         self.lab_pathDstLinkActive.place(x=90, y=508) #280
 
+        # CopyOperationType
+        options = ["select copy method","additive copy", "mirror copy"]
+        self.sdstData.copyMethod = tk.StringVar(root)
+        self.sdstData.copyMethod.set(options[0])
+        self.ddl_copyMethod = ttk.OptionMenu(self.root, self.sdstData.copyMethod, *options, command=self.ddl_copyMethod_pressed)
+        self.ddl_copyMethod.place(x=238, y=531)
+        self.ddl_copyMethod.config(width=20)
+
         # Generate button
         self.btn_GenScript_pressed = ttk.Button(self.root, text="  Generate Batch Archive Script  ", command=self.btn_GenScript_pressed)
         self.btn_GenScript_pressed.place(x=395, y=530) #500
+        self.btn_GenScript_pressed.config(state="disabled")
 
         # status bar
         self.lab_status = ttk.Label(self.root, text=":")
@@ -116,12 +125,20 @@ class SDST_UI_Main:
         self.statusUpdate("Ready")
 
         # buttons for debug and testing
-        # self.btn_injectData = ttk.Button(self.root, text="  inject temp data  ", command=self.injectData)
-        # self.btn_injectData.place(x=400, y=10)
-        # self.btn_displayData = ttk.Button(self.root, text="  print data  ", command=self.sdstDataDisplay)
-        # self.btn_displayData.place(x=500, y=10)
+        self.btn_injectData = ttk.Button(self.root, text="  inject temp data  ", command=self.injectData)
+        self.btn_injectData.place(x=200, y=10)
+        self.btn_displayData = ttk.Button(self.root, text="  print data  ", command=self.sdstDataDisplay)
+        self.btn_displayData.place(x=300, y=10)
 
         self.pathDstLink_update()
+
+    # Function to set the copy method, when selected from the dropdown
+    def ddl_copyMethod_pressed(self, *args):
+
+        #selected_item = self.sdstData.copyMethod.get()
+        self.sdstData.copyMethodStr = self.sdstData.copyMethod.get()
+        self.statusUpdate("'" + self.sdstData.copyMethodStr + "' Selected")
+        self.btn_GenScript_pressed.config(state="enabled")
 
     # Function to update the UI items, if the destination path is valid or not
     def pathDstLink_update(self):
@@ -580,6 +597,13 @@ class SDST_UI_Main:
         for curOp in self.sdstData.copyOperations:
             #print(curOp.copyOperation)
             newStr += str(curOp.copyOperation)
+
+            if self.sdstData.copyMethodStr == 'additive copy':
+                newStr += str(curOp.copyOperationAdd)
+
+            if self.sdstData.copyMethodStr == 'mirror copy':
+                newStr += str(curOp.copyOperationOver)
+
             newStr += "\n"
             newStr += "\n"
         

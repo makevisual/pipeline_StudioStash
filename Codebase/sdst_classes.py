@@ -5,7 +5,7 @@ import configparser
 
 # Main data class for holding all the data, and data objects
 class SDSTData:
-    def __init__(self, sdstVer=[0,0,1], input_pathsSrc=None, input_pathsDst=None, input_pathDstLink=None, pathDstLink=None, pathsSrc=[], pathsSrcSpaceReport=[], pathsSrcSpaceReportRun=True, pathsDst=[], pathsDstSpaceReport=[], copyOperations=[], archiveScriptString="", ui_main=None, configFile=None, config=None):
+    def __init__(self, sdstVer=[0,0,1], input_pathsSrc=None, input_pathsDst=None, input_pathDstLink=None, pathDstLink=None, pathsSrc=[], pathsSrcSpaceReport=[], pathsSrcSpaceReportRun=True, pathsDst=[], pathsDstSpaceReport=[], copyOperations=[], archiveScriptString="", ui_main=None, configFile=None, config=None, copyMethod=None, copyMethodStr=None):
         self.input_pathsSrc         = input_pathsSrc
         self.input_pathsDst         = input_pathsDst
         self.input_pathDstLink      = input_pathDstLink
@@ -19,6 +19,7 @@ class SDSTData:
         self.ui_main                = ui_main
         self.configFile             = configFile 
         self.config                 = config
+        self.copyMethod             = copyMethod
 
         self.getConfigFile()
         self.loadPropsFromConfig()
@@ -37,7 +38,9 @@ class SDSTData:
         print(f"archiveScriptString:    {self.archiveScriptString}")
         print(f"ui_main:                {self.ui_main}")
         print(f"configFile:             {self.configFile}")
-        print(f"config:             {self.config}")
+        print(f"config:                 {self.config}")
+        print(f"copyMethod:             {self.copyMethod}")
+        print(f"copyMethodStr:          {self.copyMethodStr}")
 
     # Create a new config file
     def createConfigFile(self):
@@ -122,6 +125,9 @@ class CopyOperationInfo:
         print(f"pathDstFull:        {self.pathDstFull}")
         print(f"copyOperation:      {self.copyOperation}")
 
+        print(f"copyOperationAdd:   {self.copyOperationAdd}")
+        print(f"copyOperationOver:  {self.copyOperationOver}")
+
     # populates self with the copy operation details
     def populate(self, arg_pathSrc="", arg_pathDst="",arg_handle=None):
 
@@ -144,7 +150,11 @@ class CopyOperationInfo:
 
         # Concatenate the destination path, and the robocopy operation
         self.pathDstFull = ( self.pathDstRoot + "\\" + projectName + "\\" + driveletter)
-        self.copyOperation = ( "robocopy \""+ self.pathSrc + "\" \"" + self.pathDstFull + "\" /MIR /MT:8 /w:1 /r:2" + "\n" + "attrib -h -s -r " + "\"" + self.pathDstFull + "\"")
+
+        self.copyOperation      = ( "robocopy \""+ self.pathSrc + "\" \"" + self.pathDstFull + "\" /MIR /MT:8 /w:1 /r:2" + "\n" + "attrib -h -s -r " + "\"" + self.pathDstFull + "\"")
+        self.copyOperationOver  = ( "robocopy \""+ self.pathSrc + "\" \"" + self.pathDstFull + "\" /MIR /MT:8 /w:1 /r:2" + "\n" + "attrib -h -s -r " + "\"" + self.pathDstFull + "\"")
+        self.copyOperationAdd   = ( "robocopy \""+ self.pathSrc + "\" \"" + self.pathDstFull + "\" /E /COPYALL /R:3 /W:1 /MT:32" + "\n" + "attrib -h -s -r ")
+        # self.copyOperationOver  = ( "robocopy \""+ self.pathSrc + "\" \"" + self.pathDstFull + "\" /E /COPYALL /R:3 /W:1 /MT:32" + "\n" + "attrib -h -s -r " + "\"" + self.pathDstFull + "\"")
 
         # returns the populated object
         return self
