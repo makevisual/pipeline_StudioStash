@@ -5,42 +5,47 @@ import configparser
 
 # Main data class for holding all the data, and data objects
 class SDSTData:
-    def __init__(self, sdstVer=[0,0,1], input_pathsSrc=None, input_pathsDst=None, input_pathDstLink=None, pathDstLink=None, pathsSrc=[], pathsSrcSpaceReport=[], pathsSrcSpaceReportRun=True, pathsDst=[], pathsDstSpaceReport=[], copyOperations=[], archiveScriptString="", ui_main=None, configFile=None, config=None, copyMethod=None, copyMethodStr=None):
-        self.input_pathsSrc         = input_pathsSrc
-        self.input_pathsDst         = input_pathsDst
-        self.input_pathDstLink      = input_pathDstLink
-        self.pathsSrc               = pathsSrc
-        self.pathsSrcSpaceReport    = pathsSrcSpaceReport
-        self.pathsSrcSpaceReportRun = pathsSrcSpaceReportRun
-        self.pathsDst               = pathsDst
-        self.pathDstLink            = pathDstLink
-        self.copyOperations         = copyOperations
-        self.archiveScriptString    = archiveScriptString
-        self.ui_main                = ui_main
-        self.configFile             = configFile 
-        self.config                 = config
-        self.copyMethod             = copyMethod
+    def __init__(self, sdstVer=[0,0,1], input_pathsSrc=None, input_pathsDst=None, input_pathDstLink=None, pathDstLink=None, pathsSrc=[], pathsSrcSpaceReport=[], pathsSrcSpaceReportRun=True, pathsDst=[], pathsDstSpaceReport=[], copyOperations=[], archiveScriptString="", interrogateScriptString="", deleteScriptString="", ui_main=None, configFile=None, config=None, copyMethod=None, copyMethodStr=None):
+        self.input_pathsSrc             = input_pathsSrc
+        self.input_pathsDst             = input_pathsDst
+        self.input_pathDstLink          = input_pathDstLink
+        self.pathsSrc                   = pathsSrc
+        self.pathsSrcSpaceReport        = pathsSrcSpaceReport
+        self.pathsSrcSpaceReportRun     = pathsSrcSpaceReportRun
+        self.pathsDst                   = pathsDst
+        self.pathDstLink                = pathDstLink
+        self.copyOperations             = copyOperations
+        self.archiveScriptString        = archiveScriptString
+        self.interrogateScriptString    = interrogateScriptString        
+        self.deleteScriptString         = deleteScriptString        
+        self.ui_main                    = ui_main
+        self.configFile                 = configFile 
+        self.config                     = config
+        self.copyMethod                 = copyMethod
+        self.copyMethodStr              = copyMethodStr
 
         self.getConfigFile()
         self.loadPropsFromConfig()
 
     # Prints the available information
     def display_info(self):
-        print(f"input_pathsSrc:         {self.input_pathsSrc}")
-        print(f"input_pathsDst:         {self.input_pathsDst}")
-        print(f"input_pathDstLink:      {self.input_pathDstLink}")
-        print(f"pathsSrc:               {self.pathsSrc}")
-        print(f"pathsSrcSpaceReport:    {self.pathsSrcSpaceReport}")
-        print(f"pathsSrcSpaceReportRun: {self.pathsSrcSpaceReportRun}")
-        print(f"pathsDst:               {self.pathsDst}")
-        print(f"pathDstLink:            {self.pathDstLink}")
-        print(f"copyOperations:         {self.copyOperations}")
-        print(f"archiveScriptString:    {self.archiveScriptString}")
-        print(f"ui_main:                {self.ui_main}")
-        print(f"configFile:             {self.configFile}")
-        print(f"config:                 {self.config}")
-        print(f"copyMethod:             {self.copyMethod}")
-        print(f"copyMethodStr:          {self.copyMethodStr}")
+        print(f"input_pathsSrc:             {self.input_pathsSrc}")
+        print(f"input_pathsDst:             {self.input_pathsDst}")
+        print(f"input_pathDstLink:          {self.input_pathDstLink}")
+        print(f"pathsSrc:                   {self.pathsSrc}")
+        print(f"pathsSrcSpaceReport:        {self.pathsSrcSpaceReport}")
+        print(f"pathsSrcSpaceReportRun:     {self.pathsSrcSpaceReportRun}")
+        print(f"pathsDst:                   {self.pathsDst}")
+        print(f"pathDstLink:                {self.pathDstLink}")
+        print(f"copyOperations:             {self.copyOperations}")
+        print(f"archiveScriptString:        {self.archiveScriptString}")
+        print(f"interrogateScriptString:    {self.interrogateScriptString}")
+        print(f"deleteScriptString:         {self.deleteScriptString}")
+        print(f"ui_main:                    {self.ui_main}")
+        print(f"configFile:                 {self.configFile}")
+        print(f"config:                     {self.config}")
+        print(f"copyMethod:                 {self.copyMethod}")
+        print(f"copyMethodStr:              {self.copyMethodStr}")
 
     # Create a new config file
     def createConfigFile(self):

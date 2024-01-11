@@ -60,3 +60,43 @@ def bat_saveAs(contentStr):
     if file_path:
         with open(file_path, "w") as file:
             file.write(contentStr)
+
+# saves the passed content string out as a .bat file for processing later
+def exportScripts( archiveScriptString, interrogateScriptString ):
+
+    current_datetime = datetime.datetime.now()
+    current_datetime_str = current_datetime.strftime("%Y_%m_%d__%H-%M-%S")
+
+    default_file_name_archive           = ("StudioStash__" + current_datetime_str + "__ArchiveScript.bat")
+    default_file_name_interrogate       = ("StudioStash__" + current_datetime_str + "__Interrogate.ps1")
+    default_file_name_delete            = ("StudioStash__" + current_datetime_str + "__DeleteSources.bat")
+
+    # Add command to call the check script
+    archiveScriptStringWithInterrogate = archiveScriptString
+    archiveScriptStringWithInterrogate += "\n"
+    archiveScriptStringWithInterrogate += ( "powershell.exe -ExecutionPolicy Bypass -File \"" + default_file_name_interrogate + "\"\n" )
+    archiveScriptStringWithInterrogate += "pause\n"
+
+    selected_directory = filedialog.askdirectory(title="Select Directory")
+
+# TODO: write the files
+
+    # Write the archive script
+    file_path = (selected_directory + "\\" + default_file_name_archive )
+    if file_path:
+        with open(file_path, "w") as file:
+            file.write(archiveScriptStringWithInterrogate)
+
+    # Write the interrogate script
+    file_path = (selected_directory + "\\" + default_file_name_interrogate )
+    if file_path:
+        with open(file_path, "w") as file:
+            file.write(interrogateScriptString)
+
+    # Write the interrogate script
+    file_path = (selected_directory + "\\" + default_file_name_interrogate )
+    if file_path:
+        with open(file_path, "w") as file:
+            file.write(interrogateScriptString)
+
+    pass

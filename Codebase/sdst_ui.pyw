@@ -583,6 +583,126 @@ class SDST_UI_Main:
         # Save the shortcut  
         shortcut.Save()
 
+    # Generate the interrogate script .ps1 command
+    def generateInterrogateScript(self):
+
+        # declare Vars
+        newStr = ""
+        newStr += "@echo off\n"
+        newStr += "\n"
+        newStr += "#### INPUTS\n"
+        newStr += "\n"
+
+
+        # TODO: Change this to be a dynamic list
+
+        newStr += "# List of directories to analyze"
+        newStr += "$directories_dst = @(\n"
+        newStr += "   \"C:\\test\\mockProjects\\Nuke-HeiroConform_Rubiks\",\n"
+        newStr += "   \"C:\\test\\mockProjects\\RepoRetimeRoughKey\",\n"
+        newStr += "   \"C:\\test\\mockProjects\\RiggingSkinFixAndPointCache\",\n"
+        newStr += "   \"X:\\Projects\\CrunchyRoll - Frieren\"\n"
+        newStr += ")"
+        newStr += "\n"
+
+
+        # TODO: Change this to be a dynamic list
+
+        newStr += "# List of directories to analyze\n"
+        newStr += "$directories_src = @(\n"
+        newStr += "   \"C:\\test\\mockProjects\\Nuke-HeiroConform_Rubiks\",\n"
+        newStr += "   \"C:\\test\\mockProjects\\RepoRetimeRoughKey\",\n"
+        newStr += "   \"C:\\test\\mockProjects\\RiggingSkinFixAndPointCache\",\n"
+        newStr += "   \"X:\\Projects\\CrunchyRoll - Frieren\"\n"
+        newStr += ")"
+
+
+        newStr += "\n"
+        newStr += "\n"
+        newStr += "#### DST"
+        newStr += "\n"
+        newStr += "# Initialize counters\n"
+        newStr += "$totalFiles_dst = 0\n"
+        newStr += "$totalSize_dst = 0\n"
+        newStr += "\n"
+        newStr += "# Display prompt\n"
+        newStr += "Write-Host \"- DESTINATION:\n"
+        newStr += "Write-Host \"   - calculating...\n"
+        newStr += "\n"
+        newStr += "# Iterate through each directory\n"
+        newStr += "foreach ($directory in $directories_dst) {\n"
+        newStr += "    # Get all files in the current directory\n"
+        newStr += "    $files = Get-ChildItem -Path $directory -File -Recurse\n"
+        newStr += "\n"
+        newStr += "    # Update counters\n"
+        newStr += "    $totalFiles_dst += $files.Count\n"
+        newStr += "    $totalSize_dst += $files | Measure-Object -Property Length -Sum | Select-Object -ExpandProperty Sum\n"
+        newStr += "}\n"
+        newStr += "\n"
+        newStr += "# Convert total size to human-readable format\n"
+        newStr += "$totalSize_dstInKB = $totalSize_dst / 1KB\n"
+        newStr += "$totalSize_dstInMB = $totalSize_dst / 1MB\n"
+        newStr += "$totalSize_dstInGB = $totalSize_dst / 1GB\n"
+        newStr += "$totalSize_dstInTB = $totalSize_dst / 1TB\n"
+        newStr += "\n"
+        newStr += "# Display results\n"
+        newStr += "Write-Host \"   - Total Number of Files: $totalFiles_dst\"\n"
+        newStr += "Write-Host \"   - Total File Size: $($totalSize_dst) bytes ( $totalSize_dstInGB GB, $totalSize_dstInTB TB )\"\n"
+        newStr += "\n"
+        newStr += "\n"
+        newStr += "##### SRC\n"
+        newStr += "\n"
+        newStr += "# Initialize counters\n"
+        newStr += "$totalFiles_src = 0\n"
+        newStr += "$totalSize_src = 0\n"
+        newStr += "\n"
+        newStr += "# Display prompt\n"
+        newStr += "Write-Host \"- SOURCE:\"\n"
+        newStr += "Write-Host \"   - calculating...\"\n"
+        newStr += "\n"
+        newStr += "# Iterate through each directory\n"
+        newStr += "foreach ($directory in $directories_src) {\n"
+        newStr += "    # Get all files in the current directory\n"
+        newStr += "    $files = Get-ChildItem -Path $directory -File -Recurse\n"
+        newStr += "\n"
+        newStr += "    # Update counters\n"
+        newStr += "    $totalFiles_src += $files.Count\n"
+        newStr += "    $totalSize_src += $files | Measure-Object -Property Length -Sum | Select-Object -ExpandProperty Sum\n"
+        newStr += "}\n"
+        newStr += "\n"
+        newStr += "# Convert total size to human-readable format\n"
+        newStr += "$totalSize_srcInKB = $totalSize_src / 1KB\n"
+        newStr += "$totalSize_srcInMB = $totalSize_src / 1MB\n"
+        newStr += "$totalSize_srcInGB = $totalSize_src / 1GB\n"
+        newStr += "$totalSize_srcInTB = $totalSize_src / 1TB\n"
+        newStr += "\n"
+        newStr += "# Display results\n"
+        newStr += "Write-Host \"   - Total Number of Files: $totalFiles_src\"\n"
+        newStr += "Write-Host \"   - Total File Size: $($totalSize_src) bytes ( $totalSize_srcInGB GB, $totalSize_srcInTB TB )\"\n"
+        newStr += "\n"
+        newStr += "\n"
+        newStr += "##### RESULTS\n"
+        newStr += "# Display prompt\n"
+        newStr += "Write-Host \"- RESULTS:\"\n"
+        newStr += "\n"
+        newStr += "# Compare total file sizes\n"
+        newStr += "if ($totalSize_src -eq $totalSize_dst) {\n"
+        newStr += "    Write-Host \"   - Source and Destination file size match.\"\n"
+        newStr += "} else {\n"
+        newStr += "    Write-Host \"   - WARNING! - Source and Destination file size DO NOT match.\"\n"
+        newStr += "}\n"
+        newStr += "\n"
+        newStr += "# Compare total file counts\n"
+        newStr += "if ($totalFiles_src -eq $totalFiles_dst) {\n"
+        newStr += "    Write-Host \"   - Source and Destination file count match.\"\n"
+        newStr += "} else {\n"
+        newStr += "    Write-Host \"   - WARNING! - Source and Destination file count DO NOT match.\"\n"
+        newStr += "}\n"
+        newStr += "\n"
+
+        # Store the newly generated script string
+        self.sdstData.interrogateScriptString = newStr
+
     # Generate the archive script .bat command
     def generateArchiveScript(self):
 
@@ -631,9 +751,21 @@ class SDST_UI_Main:
         newStr += ("echo " + str(len(self.sdstData.copyOperations)) + " folders were processed. \n")
         newStr += "echo The operation took !hours! hours, !minutes! minutes and !seconds! seconds and !milliseconds! milliseconds.\n"
         newStr += "echo --------------------------------------------------------------\n"
-        newStr += "pause"
 
         self.sdstData.archiveScriptString = newStr
+
+    # Generate the archive script .bat command
+    def generateDeleteScript(self):
+
+        # declare Vars
+        newStr = ""
+
+        newStr += "@echo off\n"
+
+
+
+
+        self.sdstData.deleteScriptString = newStr
 
     # Function for creating all the shortcut links, from the data object
     # NOTE - The destination of the shortcut must exist for windows to create a link
@@ -686,16 +818,32 @@ class SDST_UI_Main:
         # generate archive script
         self.generateArchiveScript()
 
+        # generate interrogate script
+        self.generateInterrogateScript()
+
+        # generate interrogate script
+        self.generateDeleteScript()
+
         # generate shortcut links
         self.generateShortcutLinks()
+
         # remove any temporary directories made for the shortcut generation
         self.generateShortcutLinksCleanup()
 
         # update status        
         self.statusUpdate(str(len(self.sdstData.copyOperations)) + " Copy operations generated " )
 
+
+
+
+        # TODO - Change this to multiple files to be exported simutaneusly 
         # Generate the .bat file
-        bat_saveAs(self.sdstData.archiveScriptString)
+        #bat_saveAs(self.sdstData.archiveScriptString)
+        exportScripts( self.sdstData.archiveScriptString, self.sdstData.interrogateScriptString, self.sdstData.deleteScriptString )
+
+
+
+
 
     # For testing buttons
     def testFunction(self):
