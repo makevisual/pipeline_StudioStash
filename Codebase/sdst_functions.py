@@ -62,41 +62,56 @@ def bat_saveAs(contentStr):
             file.write(contentStr)
 
 # saves the passed content string out as a .bat file for processing later
-def exportScripts( archiveScriptString, interrogateScriptString ):
+def exportScripts( archiveScriptString, interrogateScriptString, deleteScriptString ):
 
     current_datetime = datetime.datetime.now()
     current_datetime_str = current_datetime.strftime("%Y_%m_%d__%H-%M-%S")
 
-    default_file_name_archive           = ("StudioStash__" + current_datetime_str + "__ArchiveScript.bat")
-    default_file_name_interrogate       = ("StudioStash__" + current_datetime_str + "__Interrogate.ps1")
+    default_file_name_archive           = ("StudioStash__" + current_datetime_str + "__Archive.bat")
+    default_file_name_interrogate       = ("StudioStash__" + current_datetime_str + "__Interrogate.bat")
     default_file_name_delete            = ("StudioStash__" + current_datetime_str + "__DeleteSources.bat")
+    default_file_name_interrogatePS1    = ("StudioStash__" + current_datetime_str + "__Interrogate.ps1")
+
+    # Generate interrogate script launcher
+    launchInterrogateScriptString = ""
+    launchInterrogateScriptString += "\n"
+    launchInterrogateScriptString = ( "powershell.exe -ExecutionPolicy Bypass -File \"" + default_file_name_interrogatePS1 + "\"\n" )
+    launchInterrogateScriptString += "pause\n"
 
     # Add command to call the check script
     archiveScriptStringWithInterrogate = archiveScriptString
-    archiveScriptStringWithInterrogate += "\n"
-    archiveScriptStringWithInterrogate += ( "powershell.exe -ExecutionPolicy Bypass -File \"" + default_file_name_interrogate + "\"\n" )
-    archiveScriptStringWithInterrogate += "pause\n"
+    archiveScriptStringWithInterrogate += launchInterrogateScriptString
 
     selected_directory = filedialog.askdirectory(title="Select Directory")
+
+    outputDir = selected_directory + "\\StashActions_" + current_datetime_str
+    os.makedirs(outputDir)
+
 
 # TODO: write the files
 
     # Write the archive script
-    file_path = (selected_directory + "\\" + default_file_name_archive )
+    file_path = (outputDir + "\\" + default_file_name_archive )
     if file_path:
         with open(file_path, "w") as file:
             file.write(archiveScriptStringWithInterrogate)
 
     # Write the interrogate script
-    file_path = (selected_directory + "\\" + default_file_name_interrogate )
+    file_path = (outputDir + "\\" + default_file_name_interrogatePS1 )
     if file_path:
         with open(file_path, "w") as file:
             file.write(interrogateScriptString)
 
-    # Write the interrogate script
-    file_path = (selected_directory + "\\" + default_file_name_interrogate )
+    # Write the interrogate launcher script
+    file_path = (outputDir + "\\" + default_file_name_interrogate )
     if file_path:
         with open(file_path, "w") as file:
-            file.write(interrogateScriptString)
+            file.write(launchInterrogateScriptString)
+
+    # Write the delete script
+    file_path = (outputDir + "\\" + default_file_name_delete )
+    if file_path:
+        with open(file_path, "w") as file:
+            file.write(deleteScriptString)
 
     pass

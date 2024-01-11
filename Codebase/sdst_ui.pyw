@@ -588,15 +588,13 @@ class SDST_UI_Main:
 
         # declare Vars
         newStr = ""
-        newStr += "@echo off\n"
-        newStr += "\n"
         newStr += "#### INPUTS\n"
         newStr += "\n"
 
 
         # TODO: Change this to be a dynamic list
 
-        newStr += "# List of directories to analyze"
+        newStr += "# List of directories to analyze\n"
         newStr += "$directories_dst = @(\n"
         newStr += "   \"C:\\test\\mockProjects\\Nuke-HeiroConform_Rubiks\",\n"
         newStr += "   \"C:\\test\\mockProjects\\RepoRetimeRoughKey\",\n"
@@ -626,8 +624,11 @@ class SDST_UI_Main:
         newStr += "$totalSize_dst = 0\n"
         newStr += "\n"
         newStr += "# Display prompt\n"
-        newStr += "Write-Host \"- DESTINATION:\n"
-        newStr += "Write-Host \"   - calculating...\n"
+        newStr += "echo --------------StudioStashInterrogate--------------\n"
+        #newStr += "Write-Host \"- DESTINATION:\n"
+        #newStr += "Write-Host \"   - calculating...\n"
+        newStr += "Write-Host \"- SOURCE:\"\n"
+        newStr += "Write-Host \"   - calculating...\"\n"
         newStr += "\n"
         newStr += "# Iterate through each directory\n"
         newStr += "foreach ($directory in $directories_dst) {\n"
@@ -752,6 +753,7 @@ class SDST_UI_Main:
         newStr += "echo The operation took !hours! hours, !minutes! minutes and !seconds! seconds and !milliseconds! milliseconds.\n"
         newStr += "echo --------------------------------------------------------------\n"
 
+        # Store the newly generated script string
         self.sdstData.archiveScriptString = newStr
 
     # Generate the archive script .bat command
@@ -759,12 +761,58 @@ class SDST_UI_Main:
 
         # declare Vars
         newStr = ""
-
         newStr += "@echo off\n"
+        newStr += "setlocal enabledelayedexpansion\n"
+        newStr += "set \"directoriesToDelete=\"\n"
+        newStr += "set \"confirmation=\"\n"
+        newStr += "\n"
 
+        
+        # TODO: Change this to be a dynamic list
+        newStr += "REM Add the directories to the list\n"
+        newStr += "set \"directoriesToDelete=C:\\test\\mockArchive\\RiggingSkinFixAndPointCache\"\n"
+        newStr += "set \"directoriesToDelete=!directoriesToDelete! C:\\test\\mockArchive\\Nuke-HeiroConform_Rubiks\"\n"
+        newStr += "set \"directoriesToDelete=!directoriesToDelete! C:\\test\\mockArchive\\RepoRetimeRoughKey\"\n"
+        
 
+        newStr += "\n"
+        newStr += "echo ---- Studio Stash Delete Script ----\n"
+        newStr += "echo.\n"
+        newStr += "\n"
+        newStr += "echo Directories to delete:\n"
+        newStr += "REM Print each directory name and prompt for confirmation\n"
+        newStr += "for %%d in (%directoriesToDelete%) do (\n"
+        newStr += "    echo %%d\n"
+        newStr += ")\n"
+        newStr += "\n"
+        newStr += "echo.\n"
+        newStr += "REM Prompt the user for confirmation\n"
+        newStr += "set /p \"confirmation=Type 'delete' to confirm deletion: \"\n"
+        newStr += "\n"
+        newStr += "REM Check user input\n"
+        newStr += "if /i \"%confirmation%\"==\"delete\" (\n"
+        newStr += "    for %%d in (%directoriesToDelete%) do (\n"
+        newStr += "        if exist \"%%d\" (\n"
+        newStr += "            echo Deleting: %%d\n"
+        newStr += "            rmdir /s /q \"%%d\"\n"
+        newStr += "        ) else (\n"
+        newStr += "            echo Directory not found: %%d\n"
+        newStr += "        )\n"
+        newStr += "    )\n"
+        newStr += ") else (\n"
+        newStr += "    echo Deletion canceled. No directories were deleted.\n"
+        newStr += ")\n"
+        newStr += "\n"
+        newStr += "REM Display final confirmation message\n"
+        newStr += "echo.\n"
+        newStr += "echo All specified directories processed.\n"
+        newStr += "\n"
+        newStr += "REM Pause to keep the window open\n"
+        newStr += "pause\n"
+        newStr += "\n"
+        newStr += "endlocal\n"
 
-
+        # Store the newly generated script string
         self.sdstData.deleteScriptString = newStr
 
     # Function for creating all the shortcut links, from the data object
@@ -835,13 +883,8 @@ class SDST_UI_Main:
 
 
 
-
         # TODO - Change this to multiple files to be exported simutaneusly 
-        # Generate the .bat file
-        #bat_saveAs(self.sdstData.archiveScriptString)
         exportScripts( self.sdstData.archiveScriptString, self.sdstData.interrogateScriptString, self.sdstData.deleteScriptString )
-
-
 
 
 

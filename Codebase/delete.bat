@@ -1,9 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
-
 set "directoriesToDelete="
 set "confirmation="
-
 REM Add the directories to the list
 set "directoriesToDelete=C:\test\mockArchive\RiggingSkinFixAndPointCache" 
 set "directoriesToDelete=!directoriesToDelete! C:\test\mockArchive\Nuke-HeiroConform_Rubiks"
