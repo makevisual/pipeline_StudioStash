@@ -294,9 +294,21 @@ class SDST_UI_Main:
     # Prints data object to the console
     def sdstDataDisplay(self):
 
-        self.sdstData.display_info()
+        # Generate all scripts 
+        # self.generateArchiveScript()
+        # self.generateInterrogateScript()
+        # self.generateDeleteScript()
 
+        self.sdstData.display_info()
         self.statusUpdate("Displaying sdstData")
+
+
+        # generate the string for the file
+        for curOp in self.sdstData.copyOperations:
+            print("pathSRC: " + curOp.pathSrc)
+            print("pathDST: " + curOp.pathDstFull)
+
+
 
     # Injects testing data into sdstData
     def injectData(self):
@@ -590,31 +602,40 @@ class SDST_UI_Main:
         newStr = ""
         newStr += "#### INPUTS\n"
         newStr += "\n"
-
-
-        # TODO: Change this to be a dynamic list
-
         newStr += "# List of directories to analyze\n"
         newStr += "$directories_dst = @(\n"
-        newStr += "   \"C:\\test\\mockProjects\\Nuke-HeiroConform_Rubiks\",\n"
-        newStr += "   \"C:\\test\\mockProjects\\RepoRetimeRoughKey\",\n"
-        newStr += "   \"C:\\test\\mockProjects\\RiggingSkinFixAndPointCache\",\n"
-        newStr += "   \"X:\\Projects\\CrunchyRoll - Frieren\"\n"
+
+        # Add the path to the list of DESTINATION PATHS to iterate
+        curLen = len(self.sdstData.copyOperations)
+        i = 0
+        for curOp in self.sdstData.copyOperations:
+            newStr += ( "   \"" + str(curOp.pathDstFull) + "\"" )
+
+            # add a comma to the end of the list, if it is not the last item.
+            i+=1
+            if i < curLen:
+                newStr +=","   
+
+            newStr += "\n"        
+        
         newStr += ")"
         newStr += "\n"
-
-
-        # TODO: Change this to be a dynamic list
-
         newStr += "# List of directories to analyze\n"
         newStr += "$directories_src = @(\n"
-        newStr += "   \"C:\\test\\mockProjects\\Nuke-HeiroConform_Rubiks\",\n"
-        newStr += "   \"C:\\test\\mockProjects\\RepoRetimeRoughKey\",\n"
-        newStr += "   \"C:\\test\\mockProjects\\RiggingSkinFixAndPointCache\",\n"
-        newStr += "   \"X:\\Projects\\CrunchyRoll - Frieren\"\n"
+
+        # Add the path to the list of SOURCE PATHS to iterate
+        i = 0
+        for curOp in self.sdstData.copyOperations:
+            newStr += ( "   \"" + str(curOp.pathSrc) + "\"" )
+
+            # add a comma to the end of the list, if it is not the last item.
+            i+=1
+            if i < curLen:
+                newStr +=","            
+
+            newStr += "\n"        
+
         newStr += ")"
-
-
         newStr += "\n"
         newStr += "\n"
         newStr += "#### DST"
@@ -625,8 +646,6 @@ class SDST_UI_Main:
         newStr += "\n"
         newStr += "# Display prompt\n"
         newStr += "echo --------------StudioStashInterrogate--------------\n"
-        #newStr += "Write-Host \"- DESTINATION:\n"
-        #newStr += "Write-Host \"   - calculating...\n"
         newStr += "Write-Host \"- SOURCE:\"\n"
         newStr += "Write-Host \"   - calculating...\"\n"
         newStr += "\n"
@@ -766,14 +785,23 @@ class SDST_UI_Main:
         newStr += "set \"directoriesToDelete=\"\n"
         newStr += "set \"confirmation=\"\n"
         newStr += "\n"
-
-        
-        # TODO: Change this to be a dynamic list
         newStr += "REM Add the directories to the list\n"
-        newStr += "set \"directoriesToDelete=C:\\test\\mockArchive\\RiggingSkinFixAndPointCache\"\n"
-        newStr += "set \"directoriesToDelete=!directoriesToDelete! C:\\test\\mockArchive\\Nuke-HeiroConform_Rubiks\"\n"
-        newStr += "set \"directoriesToDelete=!directoriesToDelete! C:\\test\\mockArchive\\RepoRetimeRoughKey\"\n"
+
+        # Add the path to the list of SOURCE PATHS to iterate
+        i = 0
+        for curOp in self.sdstData.copyOperations:
+
+            newStr += "set \"directoriesToDelete="
+
+            # add a comma to the end of the list, if it is not the last item.
+            if i > 0:
+                newStr += "!directoriesToDelete! "            
+
+            newStr += ( str(curOp.pathSrc) + "\"" )
+            # newStr += ( "\"" + str(curOp.pathSrc) + "\"" )
+            newStr += "\n"    
         
+            i+=1
 
         newStr += "\n"
         newStr += "echo ---- Studio Stash Delete Script ----\n"
@@ -881,12 +909,8 @@ class SDST_UI_Main:
         # update status        
         self.statusUpdate(str(len(self.sdstData.copyOperations)) + " Copy operations generated " )
 
-
-
-        # TODO - Change this to multiple files to be exported simutaneusly 
+        # export all the scripts and tools
         exportScripts( self.sdstData.archiveScriptString, self.sdstData.interrogateScriptString, self.sdstData.deleteScriptString )
-
-
 
     # For testing buttons
     def testFunction(self):

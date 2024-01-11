@@ -1,6 +1,7 @@
 import psutil #psutil is a secondary package for getting disk usage
 import os
 import datetime
+#import subprocess
 from tkinter import filedialog
 
 # cleans up the filepath
@@ -49,6 +50,7 @@ def weighCopyOps(sdstData):
         op.pathSrcSize = get_folder_size(op.pathSrc)
 
 # saves the passed content string out as a .bat file for processing later
+# TODO: This should be depricated and removed
 def bat_saveAs(contentStr):
 
     current_datetime = datetime.datetime.now()
@@ -64,9 +66,11 @@ def bat_saveAs(contentStr):
 # saves the passed content string out as a .bat file for processing later
 def exportScripts( archiveScriptString, interrogateScriptString, deleteScriptString ):
 
+    # Get the current datetime for use in the filename
     current_datetime = datetime.datetime.now()
     current_datetime_str = current_datetime.strftime("%Y_%m_%d__%H-%M-%S")
 
+    # Generate all the filenames to create
     default_file_name_archive           = ("StudioStash__" + current_datetime_str + "__Archive.bat")
     default_file_name_interrogate       = ("StudioStash__" + current_datetime_str + "__Interrogate.bat")
     default_file_name_delete            = ("StudioStash__" + current_datetime_str + "__DeleteSources.bat")
@@ -86,9 +90,6 @@ def exportScripts( archiveScriptString, interrogateScriptString, deleteScriptStr
 
     outputDir = selected_directory + "\\StashActions_" + current_datetime_str
     os.makedirs(outputDir)
-
-
-# TODO: write the files
 
     # Write the archive script
     file_path = (outputDir + "\\" + default_file_name_archive )
@@ -113,5 +114,8 @@ def exportScripts( archiveScriptString, interrogateScriptString, deleteScriptStr
     if file_path:
         with open(file_path, "w") as file:
             file.write(deleteScriptString)
+
+    # subprocess.Popen(['start', 'explorer', (outputDir + "\\")], shell=True)
+    os.startfile(outputDir)
 
     pass

@@ -1,12 +1,11 @@
-from tkinter import filedialog
-from tkinter import Tk
+import subprocess
+import os
 
-# Create a Tkinter root window (it will not be shown)
-root = Tk()
-root.withdraw()  # Hide the main window
+folder_path = r"C:\path\to\your\folder"
 
-# Ask the user to select a directory
-selected_directory = filedialog.askdirectory(title="Select Directory")
-
-# Print the selected directory (you can use it to save your file)
-print("Selected Directory:", selected_directory)
+# Check if the folder path exists
+if os.path.exists(folder_path):
+    # Use the 'start' command to open the folder in Windows
+    subprocess.Popen(['start', 'explorer', folder_path], shell=True)
+else:
+    print(f"The folder '{folder_path}' does not exist.")
