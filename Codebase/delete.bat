@@ -3,8 +3,8 @@ setlocal enabledelayedexpansion
 set "directoriesToDelete="
 set "confirmation="
 REM Add the directories to the list
-set "directoriesToDelete=C:\test\mockArchive\RiggingSkinFixAndPointCache" 
-set "directoriesToDelete=!directoriesToDelete! C:\test\mockArchive\Nuke-HeiroConform_Rubiks"
+set "directoriesToDelete=C:\test\mockProjects\RepoRetimeRoughKey - Copy"
+set "directoriesToDelete=!directoriesToDelete! C:\test\mockProjects\Nuke-HeiroConform Rubiks - Copy"
 set "directoriesToDelete=!directoriesToDelete! C:\test\mockArchive\RepoRetimeRoughKey"
 
 echo ---- Studio Stash Delete Script ----

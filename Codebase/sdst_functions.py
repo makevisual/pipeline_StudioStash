@@ -64,14 +64,24 @@ def bat_saveAs(contentStr):
             file.write(contentStr)
 
 # saves the passed content string out as a .bat file for processing later
-def exportScripts( archiveScriptString, interrogateScriptString, deleteScriptString ):
+def exportScripts( archiveScriptString, interrogateScriptString, deleteScriptString, copyMethod ):
 
     # Get the current datetime for use in the filename
     current_datetime = datetime.datetime.now()
     current_datetime_str = current_datetime.strftime("%Y_%m_%d__%H-%M-%S")
 
+    # Change the filename depending on the type of operation is being performed
+    copyTypeString = ""
+
+    if copyMethod == 'additive copy':
+        copyTypeString = "-Additive"
+
+    if copyMethod == 'mirror copy':
+        copyTypeString = "-Mirror"
+
+
     # Generate all the filenames to create
-    default_file_name_archive           = ("StudioStash__" + current_datetime_str + "__Archive.bat")
+    default_file_name_archive           = ("StudioStash__" + current_datetime_str + "__Archive" + copyTypeString + ".bat")
     default_file_name_interrogate       = ("StudioStash__" + current_datetime_str + "__Interrogate.bat")
     default_file_name_delete            = ("StudioStash__" + current_datetime_str + "__DeleteSources.bat")
     default_file_name_interrogatePS1    = ("StudioStash__" + current_datetime_str + "__Interrogate.ps1")

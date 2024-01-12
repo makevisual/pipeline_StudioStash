@@ -46,7 +46,7 @@ class SDST_UI_Main:
         # PathsSrc Entry
         self.lab_pathsSrc = ttk.Label(self.root, text="Source path(s) to copy:")
         self.lab_pathsSrc.place(x=10, y=10)
-        self.txt_pathsSrc = tk.Text(self.root,width=50,height=2)
+        self.txt_pathsSrc = tk.Text(self.root,width=70,height=2)
         self.txt_pathsSrc.place(x=10, y=30)
         self.txt_pathsSrc.configure(bg="#4f565e") 
         self.txt_pathsSrc.configure(fg="white") 
@@ -125,10 +125,10 @@ class SDST_UI_Main:
         self.statusUpdate("Ready")
 
         # buttons for debug and testing
-        self.btn_injectData = ttk.Button(self.root, text="  inject temp data  ", command=self.injectData)
-        self.btn_injectData.place(x=200, y=10)
-        self.btn_displayData = ttk.Button(self.root, text="  print data  ", command=self.sdstDataDisplay)
-        self.btn_displayData.place(x=300, y=10)
+        # self.btn_injectData = ttk.Button(self.root, text="  inject temp data  ", command=self.injectData)
+        # self.btn_injectData.place(x=200, y=10)
+        # self.btn_displayData = ttk.Button(self.root, text="  print data  ", command=self.sdstDataDisplay)
+        # self.btn_displayData.place(x=300, y=10)
 
         self.pathDstLink_update()
 
@@ -307,8 +307,6 @@ class SDST_UI_Main:
         for curOp in self.sdstData.copyOperations:
             print("pathSRC: " + curOp.pathSrc)
             print("pathDST: " + curOp.pathDstFull)
-
-
 
     # Injects testing data into sdstData
     def injectData(self):
@@ -636,32 +634,35 @@ class SDST_UI_Main:
             newStr += "\n"        
 
         newStr += ")"
+
+        newStr += "# Function to calculate total files and size\n"
+        newStr += "function CalculateTotal($directories) {\n"
+        newStr += "    $totalFiles = 0\n"
+        newStr += "    $totalSize = 0\n"
         newStr += "\n"
+        newStr += "    foreach ($directory in $directories) {\n"
+        newStr += "        # Check if the directory exists\n"
+        newStr += "        if (Test-Path $directory -PathType Container) {\n"
+        newStr += "            # Get all files in the current directory\n"
+        newStr += "            $files = Get-ChildItem -Path $directory -File -Recurse\n"
         newStr += "\n"
-        newStr += "#### DST"
+        newStr += "            # Update counters\n"
+        newStr += "            $totalFiles += $files.Count\n"
+        newStr += "            $totalSize += $files | Measure-Object -Property Length -Sum | Select-Object -ExpandProperty Sum\n"
+        newStr += "        } else {\n"
+        newStr += "            Write-Host \"   - WARNING! Directory not found: $directory\"\n"
+        newStr += "        }\n"
+        newStr += "    }\n"
         newStr += "\n"
-        newStr += "# Initialize counters\n"
-        newStr += "$totalFiles_dst = 0\n"
-        newStr += "$totalSize_dst = 0\n"
-        newStr += "\n"
-        newStr += "# Display prompt\n"
-        newStr += "echo --------------StudioStashInterrogate--------------\n"
-        newStr += "Write-Host \"- SOURCE:\"\n"
-        newStr += "Write-Host \"   - calculating...\"\n"
-        newStr += "\n"
-        newStr += "# Iterate through each directory\n"
-        newStr += "foreach ($directory in $directories_dst) {\n"
-        newStr += "    # Get all files in the current directory\n"
-        newStr += "    $files = Get-ChildItem -Path $directory -File -Recurse\n"
-        newStr += "\n"
-        newStr += "    # Update counters\n"
-        newStr += "    $totalFiles_dst += $files.Count\n"
-        newStr += "    $totalSize_dst += $files | Measure-Object -Property Length -Sum | Select-Object -ExpandProperty Sum\n"
+        newStr += "    return $totalFiles, $totalSize\n"
         newStr += "}\n"
         newStr += "\n"
+        newStr += "# Calculate totals for destination directories\n"
+        newStr += "Write-Host \"- DESTINATION:\"\n"
+        newStr += "Write-Host \"   - calculating...\"\n"
+        newStr += "$totalFiles_dst, $totalSize_dst = CalculateTotal $directories_dst\n"
+        newStr += "\n"
         newStr += "# Convert total size to human-readable format\n"
-        newStr += "$totalSize_dstInKB = $totalSize_dst / 1KB\n"
-        newStr += "$totalSize_dstInMB = $totalSize_dst / 1MB\n"
         newStr += "$totalSize_dstInGB = $totalSize_dst / 1GB\n"
         newStr += "$totalSize_dstInTB = $totalSize_dst / 1TB\n"
         newStr += "\n"
@@ -670,29 +671,12 @@ class SDST_UI_Main:
         newStr += "Write-Host \"   - Total File Size: $($totalSize_dst) bytes ( $totalSize_dstInGB GB, $totalSize_dstInTB TB )\"\n"
         newStr += "\n"
         newStr += "\n"
-        newStr += "##### SRC\n"
-        newStr += "\n"
-        newStr += "# Initialize counters\n"
-        newStr += "$totalFiles_src = 0\n"
-        newStr += "$totalSize_src = 0\n"
-        newStr += "\n"
-        newStr += "# Display prompt\n"
+        newStr += "# Calculate totals for source directories\n"
         newStr += "Write-Host \"- SOURCE:\"\n"
         newStr += "Write-Host \"   - calculating...\"\n"
-        newStr += "\n"
-        newStr += "# Iterate through each directory\n"
-        newStr += "foreach ($directory in $directories_src) {\n"
-        newStr += "    # Get all files in the current directory\n"
-        newStr += "    $files = Get-ChildItem -Path $directory -File -Recurse\n"
-        newStr += "\n"
-        newStr += "    # Update counters\n"
-        newStr += "    $totalFiles_src += $files.Count\n"
-        newStr += "    $totalSize_src += $files | Measure-Object -Property Length -Sum | Select-Object -ExpandProperty Sum\n"
-        newStr += "}\n"
+        newStr += "$totalFiles_src, $totalSize_src = CalculateTotal $directories_src\n"
         newStr += "\n"
         newStr += "# Convert total size to human-readable format\n"
-        newStr += "$totalSize_srcInKB = $totalSize_src / 1KB\n"
-        newStr += "$totalSize_srcInMB = $totalSize_src / 1MB\n"
         newStr += "$totalSize_srcInGB = $totalSize_src / 1GB\n"
         newStr += "$totalSize_srcInTB = $totalSize_src / 1TB\n"
         newStr += "\n"
@@ -701,11 +685,8 @@ class SDST_UI_Main:
         newStr += "Write-Host \"   - Total File Size: $($totalSize_src) bytes ( $totalSize_srcInGB GB, $totalSize_srcInTB TB )\"\n"
         newStr += "\n"
         newStr += "\n"
-        newStr += "##### RESULTS\n"
-        newStr += "# Display prompt\n"
-        newStr += "Write-Host \"- RESULTS:\"\n"
-        newStr += "\n"
         newStr += "# Compare total file sizes\n"
+        newStr += "Write-Host \"- RESULTS:\"\n"
         newStr += "if ($totalSize_src -eq $totalSize_dst) {\n"
         newStr += "    Write-Host \"   - Source and Destination file size match.\"\n"
         newStr += "} else {\n"
@@ -849,37 +830,39 @@ class SDST_UI_Main:
     def generateShortcutLinks(self):
 
         # Test if the shortcut directory path exists
-            if os.path.exists(self.sdstData.pathDstLink):
-                
-                # for each of the operations, create a shortcut
-                for curOp in sdstData.copyOperations:
+            if self.sdstData.pathDstLink != None:
+                if os.path.exists(self.sdstData.pathDstLink):
+                    
+                    # for each of the operations, create a shortcut
+                    for curOp in sdstData.copyOperations:
 
-                    # Make the folder for the shortcut target, if one is not there already.
-                    if os.path.exists(curOp.pathDstFull):
-                        pass 
-                    else:
-                        os.makedirs(curOp.pathDstFull)
+                        # Make the folder for the shortcut target, if one is not there already.
+                        if os.path.exists(curOp.pathDstFull):
+                            pass 
+                        else:
+                            os.makedirs(curOp.pathDstFull)
 
-                    # Create a new timestamp, for folder naming
-                    now = datetime.datetime.now()
-                    curTimeStamp = ( str(now.year) + "_" + str(now.month) + "_" + str(now.day) )
+                        # Create a new timestamp, for folder naming
+                        now = datetime.datetime.now()
+                        curTimeStamp = ( str(now.year) + "_" + str(now.month) + "_" + str(now.day) )
 
-                    # Generate the full shortcut path
-                    shortcutLinkPath = (self.sdstData.pathDstLink + "\\" + curOp.projectName +"__" + curTimeStamp + ".lnk" )
+                        # Generate the full shortcut path
+                        shortcutLinkPath = (self.sdstData.pathDstLink + "\\" + curOp.projectName +"__" + curTimeStamp + ".lnk" )
 
-                    # Create the shortcuts
-                    self.generateShortcut(curOp.pathDstFull, shortcutLinkPath)
+                        # Create the shortcuts
+                        self.generateShortcut(curOp.pathDstFull, shortcutLinkPath)
 
     def generateShortcutLinksCleanup(self):
         # Test if the shortcut directory path exists
-            if os.path.exists(self.sdstData.pathDstLink):
-                
-                # for each of the operations, create a shortcut
-                for curOp in sdstData.copyOperations:
-
-                    # Test if the folder is less than 10 kb, and delete if true
-                    if get_folder_size(curOp.pathDstProject) <= 10:
-                        shutil.rmtree(curOp.pathDstProject)
+            if self.sdstData.pathDstLink != None:
+                if os.path.exists(self.sdstData.pathDstLink):
+                    
+                    # for each of the operations, create a shortcut
+                    for curOp in sdstData.copyOperations:
+    
+                        # Test if the folder is less than 10 kb, and delete if true
+                        if get_folder_size(curOp.pathDstProject) <= 10:
+                            shutil.rmtree(curOp.pathDstProject)
 
     # Main export button pressed
     def btn_GenScript_pressed(self):
@@ -910,7 +893,7 @@ class SDST_UI_Main:
         self.statusUpdate(str(len(self.sdstData.copyOperations)) + " Copy operations generated " )
 
         # export all the scripts and tools
-        exportScripts( self.sdstData.archiveScriptString, self.sdstData.interrogateScriptString, self.sdstData.deleteScriptString )
+        exportScripts( self.sdstData.archiveScriptString, self.sdstData.interrogateScriptString, self.sdstData.deleteScriptString, self.sdstData.copyMethodStr )
 
     # For testing buttons
     def testFunction(self):
