@@ -294,25 +294,27 @@ class SDST_UI_Main:
     # Prints data object to the console
     def sdstDataDisplay(self):
 
+        print ("Display Data")
         # Generate all scripts 
         # self.generateArchiveScript()
         # self.generateInterrogateScript()
         # self.generateDeleteScript()
+        # print (self.sdstData.deleteScriptString)
 
-        self.sdstData.display_info()
-        self.statusUpdate("Displaying sdstData")
-
+        # self.sdstData.display_info()
+        # self.statusUpdate("Displaying sdstData")
 
         # generate the string for the file
         for curOp in self.sdstData.copyOperations:
-            print("pathSRC: " + curOp.pathSrc)
-            print("pathDST: " + curOp.pathDstFull)
+           print("pathSRC: " + curOp.pathSrc)
+           print("pathDST: " + curOp.pathDstFull)
 
     # Injects testing data into sdstData
     def injectData(self):
 
         # Temp Data
-        self.sdstData.pathsSrc=["C:\\\\test\\\\mockProjects\\Nuke-HeiroConform_Rubiks", "C:\\\\test\\\\mockProjects\\\\RepoRetimeRoughKey"]
+        self.sdstData.pathsSrc=["C:\\\\test\\\\mockProjects\\\\Nuke-HeiroConform Rubiks - Copy","C:\\\\test\\\\mockProjects\\\\RepoRetimeRoughKey!","C:\\\\test\\\\mockProjects\\\\RepoRetimeRoughKey - Copy","C:\\\\test\\\\mockProjects\\\\RiggingSkinFixAndPointCache"]
+        # self.sdstData.pathsSrc=["C:\\\\test\\\\mockProjects\\Nuke-HeiroConform_Rubiks", "C:\\\\test\\\\mockProjects\\\\RepoRetimeRoughKey"]
         # self.sdstData.pathsSrc=["C:\\\\test\\\\mockProjects\\Nuke-HeiroConform_Rubiks", "C:\\\\test\\\\mockProjects\\\\RepoRetimeRoughKey","W:\\\\Projects\\\\AOT - Teaser"]
         # self.sdstData.pathsSrc=["C:\\\\test\\\\mockProjects\\Nuke-HeiroConform_Rubiks", "C:\\\\test\\\\mockProjects\\\\RepoRetimeRoughKey","W:\\\\Projects\\\\AOT - Teaser","X:\\\\Projects\\\\Days","X:\\\\Projects\\\\CHS - CorpRefresh Video","X:\\\\Projects\\\\F22 HW City - Action Spiral Playset"]
         # self.sdstData.pathsSrc=["C:\\\\test\\\\mockProjects\\Nuke-HeiroConform_Rubiks", "C:\\\\test\\\\mockProjects\\\\RepoRetimeRoughKey","W:\\\\Projects\\\\AOT - Teaser","X:\\\\Projects\\\\Callaway - Precision Technology","X:\\\\Projects\\\\Bridgestone - B-Seal","X:\\\\Projects\\\\CMDA"]
@@ -641,16 +643,21 @@ class SDST_UI_Main:
         newStr += "    $totalSize = 0\n"
         newStr += "\n"
         newStr += "    foreach ($directory in $directories) {\n"
-        newStr += "        # Check if the directory exists\n"
-        newStr += "        if (Test-Path $directory -PathType Container) {\n"
-        newStr += "            # Get all files in the current directory\n"
-        newStr += "            $files = Get-ChildItem -Path $directory -File -Recurse\n"
+        newStr += "        try {\n"
+        newStr += "            # Check if the directory exists\n"
+        newStr += "            if (Test-Path $directory -PathType Container -ErrorAction Stop) {\n"
+        newStr += "                # Get all files in the current directory\n"
+        newStr += "                $files = Get-ChildItem -Path $directory -File -Recurse -ErrorAction Stop\n"
         newStr += "\n"
-        newStr += "            # Update counters\n"
-        newStr += "            $totalFiles += $files.Count\n"
-        newStr += "            $totalSize += $files | Measure-Object -Property Length -Sum | Select-Object -ExpandProperty Sum\n"
-        newStr += "        } else {\n"
-        newStr += "            Write-Host \"   - WARNING! Directory not found: $directory\"\n"
+        newStr += "                # Update counters\n"
+        newStr += "                $totalFiles += $files.Count\n"
+        newStr += "                $totalSize += $files | Measure-Object -Property Length -Sum | Select-Object -ExpandProperty Sum\n"
+        newStr += "            } else {\n"
+        newStr += "                Write-Host \"   - WARNING! Directory not found: $directory\"\n"
+        newStr += "            }\n"
+        newStr += "        } catch {\n"
+        newStr += "            Write-Host \"   - ERROR! An error occurred while processing - possible max length exceeded\"\n"
+        newStr += "            Write-Host \"   : $($_.Exception.Message)\"\n"
         newStr += "        }\n"
         newStr += "    }\n"
         newStr += "\n"
@@ -722,7 +729,7 @@ class SDST_UI_Main:
         # generate the string for the file
         for curOp in self.sdstData.copyOperations:
             #print(curOp.copyOperation)
-            newStr += str(curOp.copyOperation)
+            #newStr += str(curOp.copyOperation)
 
             if self.sdstData.copyMethodStr == 'additive copy':
                 newStr += str(curOp.copyOperationAdd)
@@ -763,63 +770,59 @@ class SDST_UI_Main:
         newStr = ""
         newStr += "@echo off\n"
         newStr += "setlocal enabledelayedexpansion\n"
-        newStr += "set \"directoriesToDelete=\"\n"
-        newStr += "set \"confirmation=\"\n"
-        newStr += "\n"
-        newStr += "REM Add the directories to the list\n"
 
-        # Add the path to the list of SOURCE PATHS to iterate
+        # Populate the directoriesToDelete array
         i = 0
+        loopIntegerStr = ""
+
+        # for each of the copy operations add the path to the list
         for curOp in self.sdstData.copyOperations:
 
-            newStr += "set \"directoriesToDelete="
+            # Sanatize the string for any "!" characters
+            curPathSrc = str(curOp.pathSrc)
+            safePathSrc = curPathSrc.replace("!", "^!")
 
-            # add a comma to the end of the list, if it is not the last item.
-            if i > 0:
-                newStr += "!directoriesToDelete! "            
-
-            newStr += ( str(curOp.pathSrc) + "\"" )
-            # newStr += ( "\"" + str(curOp.pathSrc) + "\"" )
-            newStr += "\n"    
-        
+            # Add the path to the list, and store its integer in a list
+            newStr += ("set \"directoriesToDelete[" + str(i) + "]=" + safePathSrc + "\"\n")
+            loopIntegerStr += ( str(i) + " " )
             i+=1
 
-        newStr += "\n"
+        # Take the last space off of the integer string
+        loopIntegerStr = loopIntegerStr[:-1]
+
+        newStr += "set \"confirmation=\"\n"
         newStr += "echo ---- Studio Stash Delete Script ----\n"
         newStr += "echo.\n"
-        newStr += "\n"
         newStr += "echo Directories to delete:\n"
         newStr += "REM Print each directory name and prompt for confirmation\n"
-        newStr += "for %%d in (%directoriesToDelete%) do (\n"
-        newStr += "    echo %%d\n"
+        newStr += ("for %%d in (" + loopIntegerStr + ") do (\n")
+        newStr += "    echo !directoriesToDelete[%%d]!\n"
         newStr += ")\n"
-        newStr += "\n"
         newStr += "echo.\n"
         newStr += "REM Prompt the user for confirmation\n"
         newStr += "set /p \"confirmation=Type 'delete' to confirm deletion: \"\n"
         newStr += "\n"
         newStr += "REM Check user input\n"
         newStr += "if /i \"%confirmation%\"==\"delete\" (\n"
-        newStr += "    for %%d in (%directoriesToDelete%) do (\n"
-        newStr += "        if exist \"%%d\" (\n"
-        newStr += "            echo Deleting: %%d\n"
-        newStr += "            rmdir /s /q \"%%d\"\n"
+        newStr += "    for %%d in (" + loopIntegerStr + ") do (\n"
+        newStr += "        set \"currentDir=!directoriesToDelete[%%d]!\"\n"
+        newStr += "        if exist \"!currentDir!\" (\n"
+        newStr += "            echo Deleting: !currentDir!\n"
+        newStr += "            rmdir /s /q \"!currentDir!\"\n"
         newStr += "        ) else (\n"
-        newStr += "            echo Directory not found: %%d\n"
+        newStr += "            echo Directory not found: !currentDir!\n"
         newStr += "        )\n"
         newStr += "    )\n"
         newStr += ") else (\n"
         newStr += "    echo Deletion canceled. No directories were deleted.\n"
         newStr += ")\n"
-        newStr += "\n"
         newStr += "REM Display final confirmation message\n"
         newStr += "echo.\n"
         newStr += "echo All specified directories processed.\n"
-        newStr += "\n"
         newStr += "REM Pause to keep the window open\n"
         newStr += "pause\n"
-        newStr += "\n"
         newStr += "endlocal\n"
+        newStr += "\n"
 
         # Store the newly generated script string
         self.sdstData.deleteScriptString = newStr

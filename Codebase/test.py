@@ -1,11 +1,8 @@
-import subprocess
-import os
+# Original string
+original_string = "Hello World!"
 
-folder_path = r"C:\path\to\your\folder"
+# Remove the last character
+modified_string = original_string[:-1]
 
-# Check if the folder path exists
-if os.path.exists(folder_path):
-    # Use the 'start' command to open the folder in Windows
-    subprocess.Popen(['start', 'explorer', folder_path], shell=True)
-else:
-    print(f"The folder '{folder_path}' does not exist.")
+# Print the modified string
+print(modified_string)

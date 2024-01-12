@@ -156,10 +156,19 @@ class CopyOperationInfo:
         # Concatenate the destination path, and the robocopy operation
         self.pathDstFull = ( self.pathDstRoot + "\\" + projectName + "\\" + driveletter)
 
-        self.copyOperation      = ( "robocopy \""+ self.pathSrc + "\" \"" + self.pathDstFull + "\" /MIR /MT:8 /w:1 /r:2" + "\n" + "attrib -h -s -r " + "\"" + self.pathDstFull + "\"")
-        self.copyOperationOver  = ( "robocopy \""+ self.pathSrc + "\" \"" + self.pathDstFull + "\" /MIR /MT:8 /w:1 /r:2" + "\n" + "attrib -h -s -r " + "\"" + self.pathDstFull + "\"")
-        self.copyOperationAdd   = ( "robocopy \""+ self.pathSrc + "\" \"" + self.pathDstFull + "\" /E /COPYALL /R:3 /W:1 /MT:32" + "\n" + "attrib -h -s -r ")
-        # self.copyOperationOver  = ( "robocopy \""+ self.pathSrc + "\" \"" + self.pathDstFull + "\" /E /COPYALL /R:3 /W:1 /MT:32" + "\n" + "attrib -h -s -r " + "\"" + self.pathDstFull + "\"")
+        # Sanatize ! characters for windows bat command
+        curPathSrc          = str(self.pathSrc)
+        safePathSrc         = curPathSrc.replace("!", "^!")
+        curPathDstFull      = str(self.pathDstFull)
+        safePathDstFull     = curPathDstFull.replace("!", "^!")
+
+        #self.copyOperation      = ( "robocopy \""+ self.pathSrc + "\" \"" + self.pathDstFull + "\" /MIR /MT:8 /w:1 /r:2" + "\n" + "attrib -h -s -r " + "\"" + self.pathDstFull + "\"")
+        self.copyOperation      = ""
+        self.copyOperationOver  = ( "robocopy \""+ safePathSrc + "\" \"" + safePathDstFull + "\" /MIR /MT:8 /w:1 /r:2" + "\n" + "attrib -h -s -r " + "\"" + safePathDstFull + "\"")
+        self.copyOperationAdd   = ( "robocopy \""+ safePathSrc + "\" \"" + safePathDstFull + "\" /E /COPYALL /R:3 /W:1 /MT:32" + "\n" + "attrib -h -s -r ")
+
+        # self.copyOperationOver  = ( "robocopy \""+ self.pathSrc + "\" \"" + self.pathDstFull + "\" /MIR /MT:8 /w:1 /r:2" + "\n" + "attrib -h -s -r " + "\"" + self.pathDstFull + "\"")
+        # self.copyOperationAdd   = ( "robocopy \""+ self.pathSrc + "\" \"" + self.pathDstFull + "\" /E /COPYALL /R:3 /W:1 /MT:32" + "\n" + "attrib -h -s -r ")
 
         # returns the populated object
         return self
